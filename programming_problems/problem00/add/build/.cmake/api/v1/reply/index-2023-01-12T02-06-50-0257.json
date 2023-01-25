@@ -8,18 +8,18 @@
 		},
 		"paths" : 
 		{
-			"cmake" : "/opt/homebrew/Cellar/cmake/3.24.2/bin/cmake",
-			"cpack" : "/opt/homebrew/Cellar/cmake/3.24.2/bin/cpack",
-			"ctest" : "/opt/homebrew/Cellar/cmake/3.24.2/bin/ctest",
-			"root" : "/opt/homebrew/Cellar/cmake/3.24.2/share/cmake"
+			"cmake" : "/Applications/CMake.app/Contents/bin/cmake",
+			"cpack" : "/Applications/CMake.app/Contents/bin/cpack",
+			"ctest" : "/Applications/CMake.app/Contents/bin/ctest",
+			"root" : "/Applications/CMake.app/Contents/share/cmake-3.25"
 		},
 		"version" : 
 		{
 			"isDirty" : false,
 			"major" : 3,
-			"minor" : 24,
-			"patch" : 2,
-			"string" : "3.24.2",
+			"minor" : 25,
+			"patch" : 1,
+			"string" : "3.25.1",
 			"suffix" : ""
 		}
 	},
@@ -35,7 +35,7 @@
 			}
 		},
 		{
-			"jsonFile" : "cache-v2-d3892cbe9dfdecf7249c.json",
+			"jsonFile" : "cache-v2-d10ec4928a2f0f731dc9.json",
 			"kind" : "cache",
 			"version" : 
 			{
@@ -44,7 +44,7 @@
 			}
 		},
 		{
-			"jsonFile" : "cmakeFiles-v1-54b562ef8ceb42cecb30.json",
+			"jsonFile" : "cmakeFiles-v1-d83980b9166846ab0186.json",
 			"kind" : "cmakeFiles",
 			"version" : 
 			{
@@ -53,7 +53,7 @@
 			}
 		},
 		{
-			"jsonFile" : "toolchains-v1-855b1dec56092bf2a44b.json",
+			"jsonFile" : "toolchains-v1-105fe5704cb07de3221f.json",
 			"kind" : "toolchains",
 			"version" : 
 			{
@@ -90,7 +90,7 @@
 				"responses" : 
 				[
 					{
-						"jsonFile" : "cache-v2-d3892cbe9dfdecf7249c.json",
+						"jsonFile" : "cache-v2-d10ec4928a2f0f731dc9.json",
 						"kind" : "cache",
 						"version" : 
 						{
@@ -108,7 +108,7 @@
 						}
 					},
 					{
-						"jsonFile" : "toolchains-v1-855b1dec56092bf2a44b.json",
+						"jsonFile" : "toolchains-v1-105fe5704cb07de3221f.json",
 						"kind" : "toolchains",
 						"version" : 
 						{
@@ -117,7 +117,7 @@
 						}
 					},
 					{
-						"jsonFile" : "cmakeFiles-v1-54b562ef8ceb42cecb30.json",
+						"jsonFile" : "cmakeFiles-v1-d83980b9166846ab0186.json",
 						"kind" : "cmakeFiles",
 						"version" : 
 						{
