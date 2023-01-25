@@ -3,17 +3,19 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string>
+#include <iostream>
+
 
 class Bitset{
 public:
 
-  // TODO COMMENT
+  // bit set default constructor
   Bitset();
 
-  // TODO COMMENT
+  // bit set overload constructor
   Bitset(intmax_t size);
 
-  // TODO COMMENT
+  // bit set overload constructor
   Bitset(const std::string & value);
 
   // TODO COMMENT
@@ -44,8 +46,9 @@ public:
   std::string asString() const;
 
 private:
-
-  // TODO
+  intmax_t N;
+  int *bits;
+  bool valid = true;
 };
 
 #endif
