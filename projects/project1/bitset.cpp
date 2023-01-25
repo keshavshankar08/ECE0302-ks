@@ -19,12 +19,12 @@ Bitset::Bitset(const std::string & value) {
     bits = new int[value.length()];
     N = value.length();
     for(int i = 0; i < value.length(); i++){
-        if(value.at(i) != '0' && value.at(i) != '1'){
-            valid = false;
-            break;
+        if(value.at(i) == '0' || value.at(i) == '1'){
+            *(bits + i) = (value.at(i) - '0');
         }
         else{
-            *(bits + i) = value.at(i);
+            valid = false;
+            break;
         }
     }
 }
@@ -70,9 +70,8 @@ void Bitset::reset(intmax_t index){
 
 //@param : toggles nth bit, takes in bit position
 void Bitset::toggle(intmax_t index){
-    int lastBit = N - 1;
-    if(!(index < 0 && index > lastBit)){
-        *(bits + index) = 1 ? 0 : 1;
+    if(index > 0 && index < N){
+        *(bits + index) == 1 ? *(bits + index) = 0 : *(bits + index) = 1;
     }
     else{
         valid = false;
@@ -93,7 +92,7 @@ bool Bitset::test(intmax_t index){
 
 //@param : gets bitset as string, no params
 std::string Bitset::asString() const{
-    std::string result;
+    std::string result = "";
     for(int i = 0; i < N; i++){
         result.append(std::to_string(*(bits + i)));
     }

@@ -84,3 +84,4 @@ TEST_CASE( "Test combined", "[bitset]" ) {
         REQUIRE(((b.test(i + (1<<11)) == true && s.at(i + (1<<11)) == '0') || (b.test(i + (1<<11)) == false && s.at(i + (1<<11)) == '1')));
     }
 }
+

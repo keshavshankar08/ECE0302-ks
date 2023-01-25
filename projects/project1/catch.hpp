@@ -357,7 +357,7 @@ namespace Catch {
         for(; it != itEnd; ++it )
             delete it->second;
     }
-
+    
     bool startsWith( std::string const& s, std::string const& prefix );
     bool endsWith( std::string const& s, std::string const& suffix );
     bool contains( std::string const& s, std::string const& infix );
