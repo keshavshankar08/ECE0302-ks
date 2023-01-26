@@ -85,3 +85,72 @@ TEST_CASE( "Test combined", "[bitset]" ) {
     }
 }
 
+
+//-----------my tests-----------
+//@test : tests default constructor, size, and good
+TEST_CASE( "Default Constructor success", "[bitset]" ) {
+    Bitset b;  
+    REQUIRE(b.size() == 8);
+    REQUIRE(b.good() == true);
+}
+
+//@test : tests overload constructor, size, and good
+TEST_CASE( "Overload Constructor fail", "[bitset]" ) {
+    Bitset b(0);  
+    REQUIRE(b.size() == 0);
+    REQUIRE(b.good() == false);
+}
+
+//@test : tests string constructor, size, and good
+TEST_CASE( "String Constructor fail", "[bitset]" ) {
+    Bitset b("01010122");  
+    REQUIRE(b.size() == 0);
+    REQUIRE(b.good() == false);
+}
+
+//@test : tests destructor
+/*
+TEST_CASE( "Destructor fail", "[bitset]" ) {
+    Bitset b;
+    Bitset *copy = &b;
+    b.~Bitset();
+    REQUIRE(&b = *copy);
+}
+*/
+
+//@test : tests set method
+TEST_CASE( "Set method fail", "[bitset]" ) {
+    Bitset b(6);
+    b.set(9);
+    REQUIRE(b.good() == false);
+}
+
+//@test : tests reset method
+TEST_CASE( "Reset method fail", "[bitset]" ) {
+    Bitset b(6);
+    b.reset(6);
+    REQUIRE(b.good() == false);
+}
+
+//@test : tests toggle method
+TEST_CASE( "Toggle method fail", "[bitset]" ) {
+    Bitset b(6);
+    b.toggle(6);
+    REQUIRE(b.good() == false);
+}
+
+//@test : tests test method
+TEST_CASE( "Test method fail", "[bitset]" ) {
+    Bitset b(6);
+    REQUIRE(b.test(6) == false);
+    REQUIRE(b.good() == false);
+}
+
+//@test : tests string print method
+TEST_CASE( "String method success", "[bitset]" ) {
+    Bitset b(6);
+    b.toggle(0);
+    b.toggle(2);
+    b.toggle(4);
+    REQUIRE(b.asString() == "101010");
+}
