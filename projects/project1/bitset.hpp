@@ -46,8 +46,8 @@ public:
   std::string asString() const;
 
 private:
-  intmax_t N;
-  int *bits;
+  intmax_t N = 8;
+  int *bits = nullptr;
   bool valid = true;
 };
 

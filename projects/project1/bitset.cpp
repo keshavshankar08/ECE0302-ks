@@ -2,21 +2,26 @@
 
 //@param : constructs bitset default, no params
 Bitset::Bitset() {
-    N = 8;
     bits = new int[N];
+
+    for(int i = 0; i < N; i++){
+        *(bits + i) = 0;
+    }
 }
 
 //@param : constructs bitset using size, takes in int value
 Bitset::Bitset(intmax_t size) {
     //@pre : for input size
     //@post : create bitset with that size if valid, else set invalid bitset
+    N = size;
     if(size > 0){
-        N = size;
         bits = new int[size];
+        for(int i = 0; i < N; i++){
+            *(bits + i) = 0;
+        }
     }
     else{
-        bits = new int[0];
-        N = 0;
+      //  bits = new int[0];
         valid = false;
     }
 }
@@ -25,8 +30,8 @@ Bitset::Bitset(intmax_t size) {
 Bitset::Bitset(const std::string & value) {
     //@pre : for each char in string input
     //@post : copy over all bits to bitset if valid, else set as invalid bitset
-    bits = new int[value.length()];
     N = value.length();
+    bits = new int[value.length()];
     for(int i = 0; i < value.length(); i++){
         if(value.at(i) == '0' || value.at(i) == '1'){
             *(bits + i) = (value.at(i) - '0');
@@ -34,14 +39,13 @@ Bitset::Bitset(const std::string & value) {
         else{
             valid = false;
             N = 0;
-            break;
         }
     }
 }
 
 //@param : destructs bitset, no params
 Bitset::~Bitset(){
-    delete bits;
+    delete [] bits;
 }
 
 //@param : returns size of bitset, no params
@@ -117,7 +121,7 @@ bool Bitset::test(intmax_t index){
 std::string Bitset::asString() const{
     //@pre : for each bit in bitset
     //@post : append each bit in order to the string
-    std::string result = "";
+    std::string result;
     for(int i = 0; i < N; i++){
         result.append(std::to_string(*(bits + i)));
     }
