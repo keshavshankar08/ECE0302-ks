@@ -1,43 +1,175 @@
 #include "limited_size_bag.hpp"
 
+/**
+ * @brief Construct a new Limited Size Bag< T>:: Limited Size Bag object
+ * 
+ * @tparam T 
+ */
 template<typename T>
-LimitedSizeBag<T>::LimitedSizeBag() {}
+LimitedSizeBag<T>::LimitedSizeBag() {
+  bagArr = new T[0];
+  size = 0;
+}
   
+/**
+ * @brief add param to object array
+ * 
+ * @tparam T 
+ * @param item 
+ * @return true 
+ * @return false 
+ */
 template<typename T>
 bool LimitedSizeBag<T>::add(const T& item)
 {
-  return false;
+  //if at max size
+  if(size == maxsize){
+    return false;
+  }
+
+  //create new array with 1 larger size
+  T* bagArrCopy = new T[size+1];
+  size++;
+
+  //copy over elements from old array
+  for(int i = 0; i < size - 1; i++){
+    *(bagArrCopy + i) = *(bagArr + i);
+  }
+
+  //set last element to item
+  *(bagArrCopy + size - 1) = item;
+
+  //set old array to new array
+  bagArr = bagArrCopy;
+
+  //check if last added element is item
+  if(*(bagArrCopy + size - 1) == item){
+    return true;
+  }
+  else{
+    return false;
+  }
 }
 
+/**
+ * @brief remove all param from object array
+ * 
+ * @tparam T 
+ * @param item 
+ * @return true 
+ * @return false 
+ */
 template<typename T>
 bool LimitedSizeBag<T>::remove(const T& item)
 {
-  return false;
+  //flag for if item found
+  bool flag = false;
+
+  //count number occurances of item
+  int numOccurances = 0;
+  for(int i = 0; i < size; i++){
+    //if found, increment count and set flag to true
+    if(*(bagArr + i) == item){
+      flag = true;
+      numOccurances++;
+    }
+  }
+
+  //create new array with new size
+  T* bagArrCopy = new T[size-numOccurances];
+  size -= numOccurances;
+
+  //copy over elements that aren't the item
+  int currItem = 0;
+  for(int j = 0; j < size; j++){
+    if(*(bagArr + j) != item){
+      *(bagArrCopy + currItem) = *(bagArr + j);
+      currItem++;
+    }
+  }
+
+  //set old array to new array
+  bagArr = bagArrCopy;
+
+  return flag;
 }
 
+/**
+ * @brief check if object array empty
+ * 
+ * @tparam T 
+ * @return true 
+ * @return false 
+ */
 template<typename T>
 bool LimitedSizeBag<T>::isEmpty() const
 {
-  return false;
+  if(size != 0){
+    return false;
+  }
+  else{
+    return true;
+  }
 }
 
+/**
+ * @brief get size of object array
+ * 
+ * @tparam T 
+ * @return std::size_t 
+ */
 template<typename T>
 std::size_t LimitedSizeBag<T>::getCurrentSize() const
 {
-  return 0;
+  return size;
 }
 
 template<typename T>
 bool LimitedSizeBag<T>::contains(const T& item) const
 {  
-  return false;
+  //flag for occurance
+  bool flag = false;
+
+  //loop over entire array
+  for(int i = 0; i < size; i++){
+    //if found, set flag true
+    if(*(bagArr + i) == item){
+      flag = true;
+    }
+  }
+  return flag;
 }
 
+/**
+ * @brief clear object array
+ * 
+ * @tparam T 
+ */
 template<typename T>
-void LimitedSizeBag<T>::clear(){}
+void LimitedSizeBag<T>::clear(){
+  //create new 
+  T* bagArrCopy = new T[0];
+  size = 0;
+  bagArr = bagArrCopy;
+}
 
+/**
+ * @brief get number of occurances of param
+ * 
+ * @tparam T 
+ * @param item 
+ * @return std::size_t 
+ */
 template<typename T>
 std::size_t LimitedSizeBag<T>::getFrequencyOf(const T & item) const
 {
-  return 0;
+  //count number occurances of item
+  int numOccurances = 0;
+  for(int i = 0; i < size; i++){
+    //if found, increment count and set flag to true
+    if(*(bagArr + i) == item){
+      numOccurances++;
+    }
+  }
+  return numOccurances;
 };
