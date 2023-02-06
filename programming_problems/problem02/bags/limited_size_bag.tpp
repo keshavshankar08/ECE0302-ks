@@ -77,11 +77,12 @@ bool LimitedSizeBag<T>::remove(const T& item)
 
   //create new array with new size
   T* bagArrCopy = new T[size-numOccurances];
-  size -= numOccurances;
+  int origSize = size;
+  size = size - numOccurances;
 
   //copy over elements that aren't the item
   int currItem = 0;
-  for(int j = 0; j < size; j++){
+  for(int j = 0; j < origSize; j++){
     if(*(bagArr + j) != item){
       *(bagArrCopy + currItem) = *(bagArr + j);
       currItem++;
@@ -104,7 +105,7 @@ bool LimitedSizeBag<T>::remove(const T& item)
 template<typename T>
 bool LimitedSizeBag<T>::isEmpty() const
 {
-  if(size != 0){
+  if(size != 0 && bagArr != nullptr){
     return false;
   }
   else{
