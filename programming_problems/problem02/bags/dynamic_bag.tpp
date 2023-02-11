@@ -101,33 +101,46 @@ bool DynamicBag<T>::remove(const T& item)
 {
   //flag for if item found
   bool flag = false;
-
-  //count number occurances of item
-  int numOccurances = 0;
-  for(int i = 0; i < size; i++){
-    //if found, increment count and set flag to true
-    if(*(bagArr + i) == item){
+  for(int j = 0; j < size; j++){
+    if(*(bagArr + j) == item){
       flag = true;
-      numOccurances++;
+      break;
     }
   }
 
-  //create new array with new size
-  T* bagArrCopy = new T[size-numOccurances];
-  int origSize = size;
-  size = size - numOccurances;
+  //remove element if exists
+  if(flag == true){
+    //create copy array
+    T* bagArrCopy = new T[size-1];
 
-  //copy over elements that aren't the item
-  int currItem = 0;
-  for(int j = 0; j < origSize; j++){
-    if(*(bagArr + j) != item){
-      *(bagArrCopy + currItem) = *(bagArr + j);
-      currItem++;
+    //position of copy array
+    int currPos = 0;
+
+    //flag when passed first occurance
+    bool passedFirstOccurance = false;
+
+    //loop through original array
+    for(int i = 0; i < size; i++){
+      //if not item, add to copy array
+      if(*(bagArr + i) != item){
+        *(bagArrCopy + currPos) = *(bagArr + i);
+        currPos++;
+      }
+      //if item, but first occurance of it, skip iteration
+      else if(*(bagArr + i) == item && passedFirstOccurance == false){
+        passedFirstOccurance = true;
+      }
+      //if item, but not first occurance, add to copy array
+      else if(*(bagArr + i) == item && passedFirstOccurance == true){
+        *(bagArrCopy + currPos) = *(bagArr + i);
+        currPos++;
+      }
     }
-  }
 
-  //set old array to new array
-  bagArr = bagArrCopy;
+    //set old array to new array and change size
+    bagArr = bagArrCopy;
+    size -= 1;
+  }
 
   return flag;
 }

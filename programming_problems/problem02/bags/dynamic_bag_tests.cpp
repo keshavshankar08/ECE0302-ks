@@ -50,11 +50,9 @@ TEST_CASE("Test Remove", "[DynamicBag]"){
   for(int i = 0; i < 10; i++){
     b1.add(2);
   }
-  b1.add(1);
   REQUIRE(b1.remove(2));
   REQUIRE(!b1.isEmpty());
-  REQUIRE(b1.contains(2) == false);
-  REQUIRE(b1.getCurrentSize() == 1);
+  REQUIRE(b1.getCurrentSize() == 9);
 }
 
 TEST_CASE("Test checkEmpty", "[DynamicBag]"){
