@@ -8,7 +8,6 @@ template <typename T>
 class LinkedList: public AbstractList<T>
 {
 public:
-  
   // default constructor
   LinkedList();
   
@@ -45,9 +44,9 @@ public:
   void setEntry(std::size_t position, const T& newValue);
 
 private:
-
-  //TODO
-  
+  Node<T>* head;
+  Node<T>* tail;
+  int size = 0;
 };
 
 #include "linked_list.tpp"
