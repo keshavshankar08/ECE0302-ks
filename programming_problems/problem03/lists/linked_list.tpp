@@ -1,9 +1,15 @@
 #include "linked_list.hpp"
 
+/**
+ * @brief Construct a new Linked List< T>:: Linked List object
+ * 
+ * @tparam T 
+ */
 template <typename T>
 LinkedList<T>::LinkedList()
 {
   head = nullptr;
+  size = 0;
 }
 
 template <typename T>
@@ -12,12 +18,26 @@ LinkedList<T>::~LinkedList()
   
 }
 
+/**
+ * @brief Construct a new Linked List< T>:: Linked List object
+ * 
+ * @tparam T 
+ * @param x 
+ */
 template <typename T>
 LinkedList<T>::LinkedList(const LinkedList<T>& x)
 {
   head = x.head;
+  size = x.size;
 }
 
+/**
+ * @brief euqal override operator
+ * 
+ * @tparam T 
+ * @param x 
+ * @return LinkedList<T>& 
+ */
 template <typename T>
 LinkedList<T>& LinkedList<T>::operator=(LinkedList<T> x)
 {
@@ -25,12 +45,26 @@ LinkedList<T>& LinkedList<T>::operator=(LinkedList<T> x)
   return *this;
 }
 
+/**
+ * @brief swap nodes
+ * 
+ * @tparam T 
+ * @param x 
+ */
 template <typename T>
 void LinkedList<T>::swap(LinkedList& x) 
 {
   std::swap(head,x.head);
+  std::swap(size,x.size);
 }
 
+/**
+ * @brief check if list empty
+ * 
+ * @tparam T 
+ * @return true 
+ * @return false 
+ */
 template <typename T>
 bool LinkedList<T>::isEmpty() const noexcept
 {
@@ -42,113 +76,173 @@ bool LinkedList<T>::isEmpty() const noexcept
   }
 }
 
+/**
+ * @brief get length of list
+ * 
+ * @tparam T 
+ * @return std::size_t 
+ */
 template <typename T>
 std::size_t LinkedList<T>::getLength() const noexcept
 {
   return size;
 }
 
+/**
+ * @brief add item to list
+ * 
+ * @tparam T 
+ * @param position 
+ * @param item 
+ * @return true 
+ * @return false 
+ */
 template <typename T>
 bool LinkedList<T>::insert(std::size_t position, const T& item)
 {
-  //flag for success
-  bool flag = false;
-  if((position == 0 && size == 0) || (position < size)){
-    Node<T>* arr = new Node<T>;
-
-    //when size is 0 (first element being added)
-    if(head == nullptr){
-      size++;
-      arr.setItem(item);
-      head = arr;
-    }
-    //when size > 1 already (already elements exist)
-    else{
-      size++;
-      //loop till at position
-      arr = head;
-      for(int i = 0; i < position; i++){
-        arr.next();
-      }
-
-      //once at position, add new node
-      Node<T>* newNode = new Node<T>;
-      arr.setNext(newNode);//set last element to new node
-      newNode.setItem(item);//set new node
-      newNode.setNext(arr.getNext());//set new 
-    }
-
-    flag = true;
-
+  //if invalid position
+  if(position < 0 || position > size){
+    return false;
   }
-
-  return flag;
+  //if valid and no items yet
+  else if(position == 0 && size == 0){
+    //create new node
+    Node<T>* newNode = new Node<T>(item);
+    //set as head
+    head = newNode;
+    size++;
+    return true;
+  }
+  //if valid and inserting at 0
+  else if(position == 0 && size > 0){
+    //create new node
+    Node<T>* tempNode = head;
+    Node<T>* newNode = new Node<T>(item);
+    newNode->setNext(tempNode->getNext());
+    head = newNode;
+    size++;
+    return true;
+  }
+  //if valid and inserting elsewhere
+  else{
+    //create new node
+    Node<T>* newNode = new Node<T>(item);
+    Node<T>* tempNode = head;
+    //loop till at position
+    for(int i = 0; i < position - 1; i++){
+      tempNode = tempNode->getNext();
+    }
+    //set previous head and head of new node
+    newNode->setNext(tempNode->getNext());
+    tempNode->setNext(newNode);
+    size++;
+    return true;
+  }
 }
 
+/**
+ * @brief remove item from list
+ * 
+ * @tparam T 
+ * @param position 
+ * @return true 
+ * @return false 
+ */
 template <typename T>
 bool LinkedList<T>::remove(std::size_t position)
 {
-  //flag for success
-  bool flag = false;
-  if(size > 0 && position < size){
-    Node<T>* arr = new Node;
-    size--;
-
-    //loop till at position
-    arr = head;
-    for(int i = 0; i < position; i++){
-      arr.next();
-    }
-
-    //once at position, remove node
-    arr.setNext(arr.next().next());//set element after deleted one as next
-    arr.next();
-    newNode.setItem(nullptr);//delete next node
-
-    flag = true;
-
+  //if invalid position
+  if(position < 0 || position > size){
+    return false;
+  }
+  else if(position == 0 && size == 0){
+    return false;
   }
 
-  return flag;
+  //if valid and removing first element
+  if(position == 0){
+    Node<T>* tempNode = head;
+    head = tempNode->getNext();
+    delete tempNode;
+    size--;
+    return true;
+  }
+  //if valid and removing other elements
+  else{
+    Node<T>* tempNode = head;
+    //loop till at position
+    for(int i = 0; i < position - 1; i++){
+      tempNode = tempNode->getNext();
+    }
+    //once at position, delete node
+    Node<T>* deletionNode = tempNode->getNext();//create deletion point
+    tempNode->setNext(deletionNode->getNext());//connect temp node next to 1 after deletion node
+    delete deletionNode;
+    size--;
+    return true;
+  }
 }
 
+/**
+ * @brief clear nodes
+ * 
+ * @tparam T 
+ */
 template <typename T>
 void LinkedList<T>::clear()
 {
-  T* temp = new T[0];
+  Node<T> *temp = new Node<T>;
   head = temp; 
+  size = 0;
 }
 
+/**
+ * @brief get an item of node
+ * 
+ * @tparam T 
+ * @param position 
+ * @return T 
+ */
 template <typename T>
 T LinkedList<T>::getEntry(std::size_t position) const
 {
-  if(size > 0 && position < size){
-    Node<T>* arr = new Node;
+  //if valid position
+  if(position >= 0 && position < size){
+    Node<T>* tempNode = head;
 
     //loop till at position
-    arr = head;
-    for(int i = 0; i < position + 1; i++){
-      arr.next();
+    for(int i = 0; i < position; i++){
+      tempNode = tempNode->getNext();
     }
 
     //once at position, get node
-    return arr.getItem();
+    return tempNode->getItem();
+  }
+  else{
+    return T();
   }
 }
 
+/**
+ * @brief set an item of node
+ * 
+ * @tparam T 
+ * @param position 
+ * @param newValue 
+ */
 template <typename T>
 void LinkedList<T>::setEntry(std::size_t position, const T& newValue)
 {
-  if(size > 0 && position < size){
-    Node<T>* arr = new Node;
+  //if valid position
+  if(position >= 0 && position < size){
+    Node<T>* tempNode = head;
 
     //loop till at position
-    arr = head;
-    for(int i = 0; i < position + 1; i++){
-      arr.next();
+    for(int i = 0; i < position; i++){
+      tempNode = tempNode->getNext();
     }
 
-    //once at position, get node
-    return arr.getItem();
+    //once at position, set node
+    tempNode->setItem(newValue);
   }
 }

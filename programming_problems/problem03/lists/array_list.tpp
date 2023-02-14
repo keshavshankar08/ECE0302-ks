@@ -1,37 +1,71 @@
 #include "array_list.hpp"
 
+/**
+ * @brief Construct a new Array List< T>:: Array List object
+ * 
+ * @tparam T 
+ */
 template <typename T>
 ArrayList<T>::ArrayList() {
   arr = new T[0];
   size = 0;
 }
-
+/**
+ * @brief Destroy the Array List< T>:: Array List object
+ * 
+ * @tparam T 
+ */
 template <typename T>
 ArrayList<T>::~ArrayList() {
 
 }
-
+/**
+ * @brief Construct a new Array List< T>:: Array List object
+ * 
+ * @tparam T 
+ * @param rhs 
+ */
 template <typename T>
 ArrayList<T>::ArrayList(const ArrayList& rhs){
   arr = rhs.arr;
   size = rhs.size;
 }
 
+/**
+ * @brief override equal operator
+ * 
+ * @tparam T 
+ * @param rhs 
+ * @return ArrayList<T>& 
+ */
 template <typename T>
 ArrayList<T>& ArrayList<T>::operator=(ArrayList rhs){
   swap(rhs);
   return *this;
 }
 
+/**
+ * @brief swap elements
+ * 
+ * @tparam T 
+ * @param rhs 
+ */
 template <typename T>
 void ArrayList<T>::swap(ArrayList& rhs) {
   std::swap(arr,rhs.arr);
   std::swap(size,rhs.size);
 }
 
+/**
+ * @brief check if empty
+ * 
+ * @tparam T 
+ * @return true 
+ * @return false 
+ */
 template <typename T>
 bool ArrayList<T>::isEmpty() const noexcept {
-  if(size != 0 && arr != nullptr){
+  if(size != 0){
     return false;
   }
   else{
@@ -39,77 +73,100 @@ bool ArrayList<T>::isEmpty() const noexcept {
   }
 }
 
+/**
+ * @brief get length of list
+ * 
+ * @tparam T 
+ * @return std::size_t 
+ */
 template <typename T>
 std::size_t ArrayList<T>::getLength() const noexcept {
   return size;
 }
 
+/**
+ * @brief insert item to list
+ * 
+ * @tparam T 
+ * @param position 
+ * @param item 
+ * @return true 
+ * @return false 
+ */
 template <typename T>
 bool ArrayList<T>::insert(std::size_t position, const T& item){
-  //flag for success
-  bool flag = false;
-
+  //if position invalid, return false
+  if(position < 0 || position > size){
+    return false;
+  }
   //if position valid, continue
-  if((position == 0 && size == 0) || (position < size)){
-    //store old size
-    int oldPos = size;
-
+  else{
     //update size, create temp array
     size++;
     T* arrCopy = new T[size];
 
-    //loop to fill new array
+    //loop and copy elements
     for(int i = 0; i < size; i++){
-      if(i == position){
-        *(arrCopy + i) = item;
-        i++;
+      if(i < position){
+        *(arrCopy + i) = *(arr + i);
       }
-      *(arrCopy + i) = *(arr + oldPos);
+      else if(i == position){
+        *(arrCopy + i) = item;
+      }
+      else{
+        *(arrCopy + i) = *(arr + i - 1);
+      }
     }
 
     //update array
     arr = arrCopy;
 
-    //update flag
-    if(arr[position] == item){
-      flag = true;
-    }
+    return true;
   }
-
-  return flag;
 }
 
+/**
+ * @brief remove item from list
+ * 
+ * @tparam T 
+ * @param position 
+ * @return true 
+ * @return false 
+ */
 template <typename T>
 bool ArrayList<T>::remove(std::size_t position){
-  bool flag = false;
-  if((position == 0 && size == 0) || (position < size)){
-    flag = true;
-  } 
-
-  //if position valid
-  if(flag == true){
-    //store old size
-    int oldPos = size;
-    
+  //if position invalid, return false
+  if(position < 0 || position > size){
+    return false;
+  }
+  //if position valid, continue
+  else{
     //update size, create temp array
     size--;
     T* arrCopy = new T[size];
 
-    //track position of new arr
-    int curPos = 0;
-
-    //loop and copy elements except position
-    for(int i = 0; i < oldPos; i++){
-      if(i != position){
-        *(arrCopy + curPos) = *(arr + i);
-        curPos++;
+    //loop and copy elements
+    for(int i = 0; i < size; i++){
+      if(i < position){
+        *(arrCopy + i) = *(arr + i);
+      }
+      else{
+        *(arrCopy + i) = *(arr + i + 1);
       }
     }
-  }
 
-  return flag;
+    //update array
+    arr = arrCopy;
+
+    return true;
+  }
 }
 
+/**
+ * @brief clear elements
+ * 
+ * @tparam T 
+ */
 template <typename T>
 void ArrayList<T>::clear() {
   //create new 
@@ -118,14 +175,33 @@ void ArrayList<T>::clear() {
   arr = arrCopy;
 }
 
+/**
+ * @brief get item from list
+ * 
+ * @tparam T 
+ * @param position 
+ * @return T 
+ */
 template <typename T>
 T ArrayList<T>::getEntry(std::size_t position) const {
-  return *(arr + position);
+  if((position >= 0) && (position < size)){
+    return *(arr + position);
+  }
+  else{
+    return T();
+  }
 }
 
+/**
+ * @brief set item in list
+ * 
+ * @tparam T 
+ * @param position 
+ * @param newValue 
+ */
 template <typename T>
 void ArrayList<T>::setEntry(std::size_t position, const T& newValue) {
-  if((position == 0 && size == 0) || (position < size)){
+  if((position >= 0) && (position < size)){
     *(arr + position) = newValue;
   }
 }

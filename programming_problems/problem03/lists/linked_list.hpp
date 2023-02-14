@@ -13,7 +13,7 @@ public:
   
   // copy constructor
   LinkedList(const LinkedList& x);
-    
+  
   // destructor
   ~LinkedList();
   
@@ -44,8 +44,7 @@ public:
   void setEntry(std::size_t position, const T& newValue);
 
 private:
-  Node<T>* head;
-  Node<T>* tail;
+  Node<T>* head;//beginning of list
   int size = 0;
 };
 
