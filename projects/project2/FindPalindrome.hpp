@@ -8,7 +8,9 @@ class FindPalindrome{
 
 private:
 	// private stuff that you define and implement goes here...
-	
+	std::vector<std::string> totalSentence;
+	std::vector<std::vector<std::string>> palindromes;
+	int numPalindromes = 0;
 	// ...
 	
 	// private stuff that you are given or is specified in the project

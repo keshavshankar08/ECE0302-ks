@@ -1,0 +1,69 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "postpre",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "postpre::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-postpre-Debug-3dc57fdf8ef40cc550b3.json",
+					"name" : "postpre",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "submission::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-submission-Debug-ce2833dc2628ce575ea1.json",
+					"name" : "submission",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/keshavshankar/Library/CloudStorage/OneDrive-UniversityofPittsburgh/Spring 2023/ECE 0302/starter-code-ece0302/programming_problems/problem04/postpre/build",
+		"source" : "/Users/keshavshankar/Library/CloudStorage/OneDrive-UniversityofPittsburgh/Spring 2023/ECE 0302/starter-code-ece0302/programming_problems/problem04/postpre"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}

@@ -32,6 +32,8 @@ private:
   // You can add or change the private fields.
 
 public:
+	//flags
+	bool Tokenize, Parse = false;
 	/** The class constructor.
 		@post  Creates an instance of the class that can be used to tokenize and parse an input string . */
 	XMLParser();
