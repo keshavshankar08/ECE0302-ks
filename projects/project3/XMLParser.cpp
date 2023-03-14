@@ -17,8 +17,11 @@ XMLParser::XMLParser()
 // TODO: Implement the destructor here
 XMLParser::~XMLParser()
 {
-	Tokenize = false;
-	Parse = false;
+	//reset flags
+	tokenizeFlag = false;
+	parseFlag = false;
+
+	//clear internal data structures
 	clear();
 }  // end destructor
 
@@ -326,52 +329,77 @@ bool XMLParser::tokenizeInputString(const std::string &inputString)
 			buffer++;
 		}
 	}
-	Tokenize = true;
+
+	//update tokenize flag
+	tokenizeFlag = true;
+
 	return true;
 }  // end
 
 // TODO: Implement the parseTokenizedInput method here
 bool XMLParser::parseTokenizedInput()
 {
-	_TokenStruct_ vecStruct;
-	bool found = false;
-	string tempString, peekString;
+	//create token
+	_TokenStruct_ token;
+	string temp;
 	
+	//loop through vector
 	for(int i = 0; i < tokenizedInputVector.size(); i++){
-		vecStruct = tokenizedInputVector.at(i);
-		tempString = vecStruct.tokenString;
-		if(vecStruct.tokenType == 1){
-			parseStack->push(tempString);
+		//give token current vector element
+		token = tokenizedInputVector.at(i);
+		
+		//store string of token
+		temp = token.tokenString;
+		
+		//if type 1
+		if(token.tokenType == 1){
+			//don't add to bag, but push to stack
+			parseStack->push(temp);
 		}
-		if(vecStruct.tokenType == 2){
-			peekString = parseStack->peek();
-			if(peekString != tempString){
+		//if type 2
+		else if(token.tokenType == 2){
+			//get top of stack
+			string peekVal = parseStack->peek();
+
+			//if not at top of stack
+			if(peekVal != temp){
 				return false;
 			}
+			//if at top of stack
 			else{
-				elementNameBag->add(tempString);
+				//add it to bag and remove from stack
+				elementNameBag->add(temp);
 				parseStack->pop();
 			}
 		}
-		if(vecStruct.tokenType == 3){
-			elementNameBag->add(tempString);
+		//if type 3
+		else if(token.tokenType == 3){
+			//add to bag, not in stack
+			elementNameBag->add(temp);
 		}
 	}
-	Parse = true;
+
+	//update parse flag
+	parseFlag = true;
+
 	return true;
 }
 
 // TODO: Implement the clear method here
 void XMLParser::clear()
 {
+	//clear bag and stack
 	delete elementNameBag;
 	delete parseStack;
+
+	//clear vector
 	int i = 0; 
+	//while not at end
 	while(i < tokenizedInputVector.size()){
+		//pop element from vector and increment loop
 		tokenizedInputVector.pop_back();
 		i++;
 	}
-	tokenizedInputVector = vector<TokenStruct>();
 }
 
 vector<TokenStruct> XMLParser::returnTokenizedInput() const
@@ -382,34 +410,44 @@ vector<TokenStruct> XMLParser::returnTokenizedInput() const
 // TODO: Implement the containsElementName method
 bool XMLParser::containsElementName(const std::string &inputString) const
 {
-	if(Parse && Tokenize){
+	//if tokenizeInputstring() and parseTokenizedInput() are true
+	if(tokenizeFlag && parseFlag){
+		//loop through data
 		for(int i = 0; i < elementNameBag->size(); i++){
+			//check if target string at that position
 			if(elementNameBag->contains(inputString)){
 				return true;
 			}
 		}
 		return false;
 	}
-	throw(logic_error("Error"));
+	//else, input not tokenized/parsed
+	else{
+		throw(logic_error("Error"));
+	}
 }
 
 // TODO: Implement the frequencyElementName method
 int XMLParser::frequencyElementName(const std::string &inputString) const
 {
-	if(Parse && Tokenize){
-		int count = 1;
-		vector<string> vec1 = elementNameBag->toVector();
+	//if tokenizeInputstring() and parseTokenizedInput() are true
+	if(tokenizeFlag == true && parseFlag == true){
+		//vars for num occurances and bag data
+		int count = 0;
+		vector<string> data = elementNameBag->toVector();
 
-		for(int i = 0; i < elementNameBag->size(); i++){
-			if(vec1.at(i) == inputString){
+		//loop through vector and count num occurances
+		for(int i = 0; i < data.size(); i++){
+			if(data.at(i) == inputString){
 				count++;
 			}
 		}
 
-		vec1 = vector<string>();
 		return count;
 	}
-
-	throw(logic_error("Error"));
+	//else, input not tokenized/parsed
+	else{
+		throw(logic_error("Error not tokenized/parsed"));
+	}
 }
 

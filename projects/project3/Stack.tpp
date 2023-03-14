@@ -12,7 +12,6 @@
 template<class ItemType>
 Stack<ItemType>::Stack() : headPtr(nullptr) 
 {
-	
 }  // end default constructor
 
 // TODO: Implement the destructor here
@@ -28,7 +27,12 @@ Stack<ItemType>::~Stack()
 template<class ItemType>
 bool Stack<ItemType>::isEmpty() const
 {
-	return headPtr == nullptr;
+	if(headPtr == nullptr){
+		return false;
+	}
+	else{
+		return true;
+	}
 }  // end isEmpty
 
 // TODO: Implement the size method here
@@ -42,23 +46,36 @@ int Stack<ItemType>::size() const
 template<class ItemType>
 bool Stack<ItemType>::push(const ItemType& newItem)
 {
+	//create new node, set item to newItem and its next to the current head
 	Node<ItemType> *newPtr = new Node<ItemType> (newItem, headPtr);
+
+	//update head and size
 	headPtr = newPtr;
-	newPtr = nullptr;
 	currentSize++;
-	return true;
+
+	//deallocate
+	delete newPtr;
+
+	//check if successful
+	if(headPtr->getItem() == newItem){
+		return true;
+	}
+	else{
+		return false;
+	}
 }  // end push
 
 // TODO: Implement the peek method here
 template<class ItemType>
 ItemType Stack<ItemType>::peek() const
 {
+	//if not empty, get top
 	if(isEmpty() == false){
 		return headPtr->getItem();
 	}
+	//else, throw error
 	else{
-		throw logic_error("error1");
-		return headPtr->getItem();
+		throw logic_error("error peek");
 	}
 }  // end peek
 
@@ -66,35 +83,47 @@ ItemType Stack<ItemType>::peek() const
 template<class ItemType>
 bool Stack<ItemType>::pop() 
 {
-	bool flag = false;
+	//if not empty
 	if(isEmpty() == false){
-		Node<ItemType> *deletePtr = headPtr;
+		//create deletion node with top
+		Node<ItemType> *deletionPtr = headPtr;
+
+		//set new head to 1 after current head
 		headPtr = headPtr->getNext();
 
-		deletePtr->setNext(nullptr);
-		delete deletePtr;
-		deletePtr = nullptr;
+		//delink and delete the node
+		deletionPtr->setNext(nullptr);
+		delete deletionPtr;
 
-		flag = true;
+		//update size
 		currentSize--;
+
+		return true;
 	}
 
-	return flag;
+	return false;
 }  // end pop
 
 // TODO: Implement the clear method here
 template<class ItemType>
 void Stack<ItemType>::clear()
 {
-	Node<ItemType> *ptr = headPtr;
+	//make traversing node
+	Node<ItemType> *tempNode;
 
-	while(ptr != NULL){
-		ptr = headPtr;
-		ptr = headPtr->getNext();
-		delete ptr;
-		headPtr = ptr;
+	//while not at end or empty list
+	while(tempNode != NULL){
+		//set temp as head
+		tempNode = headPtr;
+
+		//set head to the next value
+		headPtr = headPtr->getNext();
+
+		//free previous node
+		delete tempNode;
 	}
 	
+	//reset size
 	currentSize = 0;
 }  // end clear
 
