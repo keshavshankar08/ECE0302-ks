@@ -17,9 +17,9 @@ XMLParser::XMLParser()
 // TODO: Implement the destructor here
 XMLParser::~XMLParser()
 {
-	//reset flags
-	tokenizeFlag = false;
-	parseFlag = false;
+	//delete bag and stack
+	delete elementNameBag;
+	delete parseStack;
 
 	//clear internal data structures
 	clear();
@@ -28,309 +28,203 @@ XMLParser::~XMLParser()
 // TODO: Implement the tokenizeInputString method
 bool XMLParser::tokenizeInputString(const std::string &inputString)
 {
-	TokenStruct myStruct;
-	string tempString, tagName, decTagName, tagType, strLengthTrack;
-	int start, stop, a;
+	//create token
+	TokenStruct token;
+
+	//other vars
+	string tagName, decTagName, tagType;
+
+	//stop/start vars
+	int start, stop, tempCurrPoint;
 	
-	int cursor = 0;
+	int currentPoint = 0;
 	int buffer = 0;
 	int alpha = 0;
-	bool test = false;
-	std:: cout << "The length of the string is : " << inputString.length() << std::endl;
-	while(cursor < inputString.length()-1)
-	{
-		tempString = "";
+	bool needsTesting = false;
+
+	//loop through string input
+	while(currentPoint < inputString.length() - 1){
+		//string to store data between < and >
+		string currentString = "";
+
 		tagName = "";
 		tagType = "";
 		decTagName = "";
-		if(inputString[cursor] == '<')
-		{
-			
-			a= cursor + 1;
-			while (inputString[cursor] != '>')
-			{
-				while(inputString[a] != '>')
-				{
-					tempString += inputString[a];
-					strLengthTrack += inputString[a];
-					cursor++;
-					a++;
+
+		//----------TAGS----------
+		//find start of tag
+		if(inputString[currentPoint] == '<'){
+			//set pointer to one after start tag
+			tempCurrPoint = currentPoint + 1;
+
+			//read everything until end tag
+			while(inputString[currentPoint] != '>'){
+				//copy info between delimiters
+				while(inputString[tempCurrPoint] != '>'){
+					currentString += inputString[tempCurrPoint];
+
+					//update pointers
+					currentPoint++;
+					tempCurrPoint++;
 				}
 				
-				std::cout << "TempString: " << tempString << std::endl;
-				std::cout << "this is the potential tag: " << tempString <<  std::endl;
-
-				if(tempString[0] == '/')
-				{
+				//if the copied string is end tag
+				if(currentString[0] == '/'){
+					//store tag type to token
 					tagType = "END_TAG";
-					test = true;
-					for(int j  = 1; j < tempString.length(); j++)
-					{
-						tagName+= tempString[j];	//fixes tagName
+					token.tokenType = END_TAG;
+
+					//needs to be tested
+					needsTesting = true;
+
+					//copy over tag name, excluding identification char
+					for(int j = 1; j < currentString.length(); j++){
+						tagName+= currentString[j];
 					}
-					std::cout << "TagName: " << tagName << std::endl;
 				}
-				else if(tempString[tempString.length()-1] == '/' )	//last character 
-				{
+				//if the copied string is empty tag
+				else if(currentString[currentString.length() - 1] == '/'){
+					//store tag type to token
 					tagType = "EMPTY_TAG";
-					test = true;
-					for(int j  = 0; j < tempString.length()-1; j++)
-					{
-						tagName+=  tempString[j];
+					token.tokenType = EMPTY_TAG;
+
+					//needs to be tested
+					needsTesting = true;
+
+					//copy over tag name 
+					for(int j  = 0; j < currentString.length() - 1; j++){
+						tagName+=  currentString[j];
 					}
-					std::cout << "Tagname: " << tagName << std::endl;
 				}
-				else if(tempString[0]== '?' && tempString[tempString.length()-1] == '?')
-				{
+				//if the copied string is declaration tag
+				else if(currentString[0]== '?' && currentString[currentString.length()-1] == '?'){
+					//store tag type to token
 					tagType = "DECLARATION";
-					test = false;
-					int count = 0;
-					int b = 0;
-					for (int j = 1;  j < tempString.length()-1; j++)
-					{
-						tagName+= tempString[j];
+					token.tokenType = DECLARATION;
+
+					//needs to be tested
+					needsTesting = false;
+
+					//copy over tag name, excluding identification char
+					for(int j = 1;  j < currentString.length() - 1; j++){
+						tagName+= currentString[j];
 					}
-					std::cout << "Tagname: " <<tagName << std::endl;
 				}
-				else
-				{
+				//else the  copied string is start tag
+				else{
+					//store tag type to token
 					tagType = "START_TAG";
-					test = true;
+					token.tokenType = START_TAG;
+
+					//needs to be tested
+					needsTesting = true;
+
+					//copy over tag name
 					int j = 0;
-					while(tempString[j]!= '>' && j < tempString.length())
-					{
-						tagName+=tempString[j];
+					while(currentString[j] != '>' && j < currentString.length()){
+						tagName += currentString[j];
 						j++;
-						if(tempString[j]== ' ')
+
+						//stop if blank space found
+						if(currentString[j]== ' ')
 						{
 							break;
 						}
 					}
-					std::cout << "Tag Type: " << tagType << std::endl;
 				}
 
-				if(tagType == "END_TAG")
-				{
-					std::cout << "Token is EndTag" << std:: endl;
-					myStruct.tokenType = END_TAG;
-				}
-				else if (tagType == "START_TAG")
-				{
-					std::cout << "Token is StartTag" << std:: endl;
-					myStruct.tokenType = START_TAG;
-				}
-				else if(tagType == "EMPTY_TAG")
-				{
-					std::cout << "Token is EmptyTag" << std:: endl;
-					myStruct.tokenType = EMPTY_TAG;
-				}
-				else if (tagType == "DECLARATION")
-				{
-					std::cout << "Token is Declaration" << std:: endl;
-					myStruct.tokenType = DECLARATION;
-				}
-				myStruct.tokenString = tagName;
+				//store tagname to token
+				token.tokenString = tagName;
 
-				if(test == true)	//we SHOULD test
+				//if tag, need to test validity
+				if(needsTesting == true)
 				{
-					if (tagName[0]== ' ' || tagName[0]== '-' || tagName[0] == '.')
-					{
-						return false;
-					}
-					switch (tagName[0])
-					{
-						case '0':
+					//checking invalid beginning character
+					char invalidBeginChars[] = {' ', '-', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+					for(int posInval = 0; posInval < 13; posInval++){
+						if(tagName[0] == invalidBeginChars[posInval]){
 							return false;
-							break;
-						case '1':
-							return false;
-							break;
-						case '2':
-							return false;
-							break;
-						case '3':
-							return false;
-							break;
-						case '4':
-							return false;
-							break;
-						case '5':
-							return false;
-							break;
-						case '6':
-							return false;
-							break;
-						case '7':
-							return false;
-							break;
-						case '8':
-							return false;
-							break;
-						case '9':
-							return false;
-							break;
-						default:
-							std:: cout << "there are no illegal characters at first index" << std::endl;
-							break;
+						}
 					}
 					
+					//checking invalid characters in tagname
 					for (int a = 0; a < tagName.length()-1; a++)
 					{
 						char ch = tagName[a];
-						switch (ch)
-						{
-							case '!' :
-								
+						char invalidChars[] = {'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '/', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '`', '{', '|', '}', '~', '.'};
+						for(int posInval = 0; posInval < 29; posInval++){
+							if(ch == invalidChars[posInval]){
 								return false;
-								break;
-							case '"' :
-								return false;
-								break;
-							case '#' :
-								return false;
-								break;
-							case '$' :
-								return false;
-								break;
-							case '%' :
-								return false;
-								break;
-							case '&' :
-								return false;
-								break;				
-							case '\'' :
-								return false;
-								break;	
-							case '(' :
-								return false;
-								break;	
-							case ')' :
-								return false;
-								break;	
-							case '*' :
-								return false;
-								break;	
-							case '+' :
-								return false;
-								break;	
-							case ',' :
-								return false;
-								break;
-							case '/' :
-								return false;
-								break;
-							case ';' :
-								return false;
-								break;
-							case '<' :
-								return false;
-								break;
-							case '=' :
-								return false;
-								break;
-							case '>' :
-								return false;
-								break;
-							case '?' :
-								return false;
-								break;
-							case '@' :
-								return false;
-								break;
-							case '[' :
-								return false;
-								break;
-							case '\\' :
-								return false;
-								break;
-							case ']' :
-								return false;
-								break;
-							case '^' :
-								return false;
-								break;
-							case '`' :
-								return false;
-								break;
-							case '{' :
-								return false;
-								break;
-							case '|' :
-								return false;
-								break;
-							case '}' :
-								return false;
-								break;
-							case '~' :
-								return false;
-								break;
-							case ' ' :
-								
-								return false;
-								break;						
-							default:
-								break;
+							}
 						}
 					}
 				}
-				tokenizedInputVector.push_back(myStruct);
-				std:: cout << "successfully pushed back to vector" << std:: endl;
-				if(tagType== "DECLARATION")
-				{
-					cursor++;
+
+				//since valid, push tag token to vector
+				tokenizedInputVector.push_back(token);
+
+				//update current point in string based on tag read
+				if(tagType== "DECLARATION"){
+					currentPoint++;
 					buffer = 4;
 				}
-				else if (tagType == "START_TAG")
-				{
-					cursor++;
+				else if(tagType == "START_TAG"){
+					currentPoint++;
 				}
-				else if(tagType == "EMPTY_TAG")
-				{
-					cursor++;
+				else if(tagType == "EMPTY_TAG"){
+					currentPoint++;
 				}
-				else if (tagType == "END_TAG")
-				{
-					cursor++;
+				else if(tagType == "END_TAG"){
+					currentPoint++;
 				}
 			}
 			alpha++;
 		}
 
-		if(inputString[cursor] != '<' && inputString[cursor] != '>')
-		{
-			while (inputString[cursor] != '<')
-			{
-				tagName += inputString[cursor];	//make tag name equal the content
-				cursor++;
+		//----------CONTENT----------
+		//if not a tag start/stop
+		if(inputString[currentPoint] != '<' && inputString[currentPoint] != '>'){
+			//until a tag detected
+			while(inputString[currentPoint] != '<'){
+				//copy over element to tagname
+				tagName += inputString[currentPoint];
+				
+				//update pointer
+				currentPoint++;
 			}
-				std::cout << "Tagname: " << tagName << std::endl;
-			int tempInt = tagName.length();
-			int numSpace = 0;
-			for (int b = 0; b < tempInt; b++)
-			{
-				if(isspace(tagName[b]))
-					numSpace++;
+			
+			//count how many spaces in element
+			int numSpaces = 0;
+			for(int k = 0; k < tagName.length(); k++){
+				if(isspace(tagName[k])){
+					numSpaces++;
+				}
 			}
-			if(numSpace < tempInt)
-			{
-				myStruct.tokenString = tagName;
-				myStruct.tokenType = CONTENT;
-				tokenizedInputVector.push_back(myStruct);
-				std:: cout << "successfully pushed back to vector" << std:: endl;
-			}	
-		} 
-		if(myStruct.tokenType != CONTENT)
-		{
-			cursor++;
+
+			//if valid element
+			if(numSpaces < tagName.length()){
+				//set token data
+				token.tokenString = tagName;
+				token.tokenType = CONTENT;
+
+				//push token to vector
+				tokenizedInputVector.push_back(token);
+			}
 		}
-		if(isspace(inputString[cursor]))
-		{
-			cursor++;
+		
+		//move cursor after > if element not just read
+		if(token.tokenType != CONTENT){
+			currentPoint++;
+		}
+
+		//skip over spaces
+		if(isspace(inputString[currentPoint])){
+			currentPoint++;
 			buffer++;
 		}
 	}
 
-	//update tokenize flag
+	//update tokenize flag since valid
 	tokenizeFlag = true;
 
 	return true;

@@ -12,6 +12,8 @@
 template<class ItemType>
 Stack<ItemType>::Stack() : headPtr(nullptr) 
 {
+	headPtr = nullptr;
+	currentSize = 0;
 }  // end default constructor
 
 // TODO: Implement the destructor here
@@ -28,10 +30,10 @@ template<class ItemType>
 bool Stack<ItemType>::isEmpty() const
 {
 	if(headPtr == nullptr){
-		return false;
+		return true;
 	}
 	else{
-		return true;
+		return false;
 	}
 }  // end isEmpty
 
@@ -46,23 +48,22 @@ int Stack<ItemType>::size() const
 template<class ItemType>
 bool Stack<ItemType>::push(const ItemType& newItem)
 {
-	//create new node, set item to newItem and its next to the current head
-	Node<ItemType> *newPtr = new Node<ItemType> (newItem, headPtr);
-
-	//update head and size
-	headPtr = newPtr;
-	currentSize++;
-
-	//deallocate
-	delete newPtr;
-
-	//check if successful
-	if(headPtr->getItem() == newItem){
-		return true;
+	//if its empty
+	if(isEmpty()){
+		//create new node and set it as head
+		headPtr = new Node<ItemType>(newItem);
+		currentSize++;
 	}
 	else{
-		return false;
+		//create new node, set item to newItem and its next to the current head
+		Node<ItemType> *newPtr = new Node<ItemType>(newItem, headPtr);
+
+		//update head and size
+		headPtr = newPtr;
+		currentSize++;
 	}
+
+	return true;
 }  // end push
 
 // TODO: Implement the peek method here
@@ -85,45 +86,22 @@ bool Stack<ItemType>::pop()
 {
 	//if not empty
 	if(isEmpty() == false){
-		//create deletion node with top
-		Node<ItemType> *deletionPtr = headPtr;
-
-		//set new head to 1 after current head
 		headPtr = headPtr->getNext();
-
-		//delink and delete the node
-		deletionPtr->setNext(nullptr);
-		delete deletionPtr;
-
-		//update size
 		currentSize--;
-
-		return true;
+	}
+	//if empty
+	else{
+		return false;
 	}
 
-	return false;
 }  // end pop
 
 // TODO: Implement the clear method here
 template<class ItemType>
 void Stack<ItemType>::clear()
 {
-	//make traversing node
-	Node<ItemType> *tempNode;
-
-	//while not at end or empty list
-	while(tempNode != NULL){
-		//set temp as head
-		tempNode = headPtr;
-
-		//set head to the next value
-		headPtr = headPtr->getNext();
-
-		//free previous node
-		delete tempNode;
-	}
-	
-	//reset size
+	//update head and size
+	headPtr = nullptr;
 	currentSize = 0;
 }  // end clear
 
