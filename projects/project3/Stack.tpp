@@ -88,6 +88,8 @@ bool Stack<ItemType>::pop()
 	if(isEmpty() == false){
 		headPtr = headPtr->getNext();
 		currentSize--;
+
+		return true;
 	}
 	//if empty
 	else{

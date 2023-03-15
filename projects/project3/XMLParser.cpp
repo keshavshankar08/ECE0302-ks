@@ -28,203 +28,141 @@ XMLParser::~XMLParser()
 // TODO: Implement the tokenizeInputString method
 bool XMLParser::tokenizeInputString(const std::string &inputString)
 {
-	//create token
-	TokenStruct token;
-
-	//other vars
-	string tagName, decTagName, tagType;
-
-	//stop/start vars
-	int start, stop, tempCurrPoint;
+	bool isStart = false, isContent = true, isInvalid = false;
+	string tokenTag = "", tokenContent = "";
 	
-	int currentPoint = 0;
-	int buffer = 0;
-	int alpha = 0;
-	bool needsTesting = false;
-
-	//loop through string input
-	while(currentPoint < inputString.length() - 1){
-		//string to store data between < and >
-		string currentString = "";
-
-		tagName = "";
-		tagType = "";
-		decTagName = "";
-
-		//----------TAGS----------
-		//find start of tag
-		if(inputString[currentPoint] == '<'){
-			//set pointer to one after start tag
-			tempCurrPoint = currentPoint + 1;
-
-			//read everything until end tag
-			while(inputString[currentPoint] != '>'){
-				//copy info between delimiters
-				while(inputString[tempCurrPoint] != '>'){
-					currentString += inputString[tempCurrPoint];
-
-					//update pointers
-					currentPoint++;
-					tempCurrPoint++;
+	//loop through string
+	for(char c : inputString){
+		//if at start of tag
+		if(c == '<' && !isStart){
+			//if theres content already
+			if(tokenContent.length() > 0){
+				//loop through content and remove white spaces
+				string tempTokenContent = "";
+				for(int i = 0; i < tokenContent.length(); i++){
+					if(tokenContent[i] != ' '){
+						tempTokenContent += tokenContent[i];
+					}
+					else{
+						break;
+					}
 				}
+				tokenContent = tempTokenContent;
 				
-				//if the copied string is end tag
-				if(currentString[0] == '/'){
-					//store tag type to token
-					tagType = "END_TAG";
-					token.tokenType = END_TAG;
-
-					//needs to be tested
-					needsTesting = true;
-
-					//copy over tag name, excluding identification char
-					for(int j = 1; j < currentString.length(); j++){
-						tagName+= currentString[j];
-					}
-				}
-				//if the copied string is empty tag
-				else if(currentString[currentString.length() - 1] == '/'){
-					//store tag type to token
-					tagType = "EMPTY_TAG";
-					token.tokenType = EMPTY_TAG;
-
-					//needs to be tested
-					needsTesting = true;
-
-					//copy over tag name 
-					for(int j  = 0; j < currentString.length() - 1; j++){
-						tagName+=  currentString[j];
-					}
-				}
-				//if the copied string is declaration tag
-				else if(currentString[0]== '?' && currentString[currentString.length()-1] == '?'){
-					//store tag type to token
-					tagType = "DECLARATION";
-					token.tokenType = DECLARATION;
-
-					//needs to be tested
-					needsTesting = false;
-
-					//copy over tag name, excluding identification char
-					for(int j = 1;  j < currentString.length() - 1; j++){
-						tagName+= currentString[j];
-					}
-				}
-				//else the  copied string is start tag
-				else{
-					//store tag type to token
-					tagType = "START_TAG";
-					token.tokenType = START_TAG;
-
-					//needs to be tested
-					needsTesting = true;
-
-					//copy over tag name
-					int j = 0;
-					while(currentString[j] != '>' && j < currentString.length()){
-						tagName += currentString[j];
-						j++;
-
-						//stop if blank space found
-						if(currentString[j]== ' ')
-						{
-							break;
-						}
-					}
-				}
-
-				//store tagname to token
-				token.tokenString = tagName;
-
-				//if tag, need to test validity
-				if(needsTesting == true)
-				{
-					//checking invalid beginning character
-					char invalidBeginChars[] = {' ', '-', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-					for(int posInval = 0; posInval < 13; posInval++){
-						if(tagName[0] == invalidBeginChars[posInval]){
-							return false;
-						}
-					}
-					
-					//checking invalid characters in tagname
-					for (int a = 0; a < tagName.length()-1; a++)
-					{
-						char ch = tagName[a];
-						char invalidChars[] = {'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '/', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '`', '{', '|', '}', '~', '.'};
-						for(int posInval = 0; posInval < 29; posInval++){
-							if(ch == invalidChars[posInval]){
-								return false;
-							}
-						}
-					}
-				}
-
-				//since valid, push tag token to vector
-				tokenizedInputVector.push_back(token);
-
-				//update current point in string based on tag read
-				if(tagType== "DECLARATION"){
-					currentPoint++;
-					buffer = 4;
-				}
-				else if(tagType == "START_TAG"){
-					currentPoint++;
-				}
-				else if(tagType == "EMPTY_TAG"){
-					currentPoint++;
-				}
-				else if(tagType == "END_TAG"){
-					currentPoint++;
-				}
-			}
-			alpha++;
-		}
-
-		//----------CONTENT----------
-		//if not a tag start/stop
-		if(inputString[currentPoint] != '<' && inputString[currentPoint] != '>'){
-			//until a tag detected
-			while(inputString[currentPoint] != '<'){
-				//copy over element to tagname
-				tagName += inputString[currentPoint];
-				
-				//update pointer
-				currentPoint++;
-			}
-			
-			//count how many spaces in element
-			int numSpaces = 0;
-			for(int k = 0; k < tagName.length(); k++){
-				if(isspace(tagName[k])){
-					numSpaces++;
-				}
-			}
-
-			//if valid element
-			if(numSpaces < tagName.length()){
-				//set token data
-				token.tokenString = tagName;
+				//create token with tag info
+				TokenStruct token;
+				token.tokenString = tokenContent;
 				token.tokenType = CONTENT;
 
 				//push token to vector
 				tokenizedInputVector.push_back(token);
 			}
+
+			//reset strings
+			tokenContent = "";
+			tokenTag = "";
+			isStart = true;
+			isContent = false;
 		}
-		
-		//move cursor after > if element not just read
-		if(token.tokenType != CONTENT){
-			currentPoint++;
+		//store the tag
+		else if(c == '>' && isStart){
+			//add char to tag
+			tokenTag += c;
+
+			//create token with tag info
+			TokenStruct token;
+
+			//-----removing tags from string-----
+			//if content
+			if(tokenTag[0] != '<'){
+				continue;
+			}
+			//if declaration tag
+			else if(tokenTag[1] == '?'){
+				tokenTag = tokenTag.substr(2,tokenTag.length()-4);
+			}
+			//if full tag with both delimiters 
+			else{
+				string tempTokenTag = "";
+				//loop through everything after delimiter
+				for(int i = 1; i < tokenTag.length(); i++){
+					//if end/empty tag
+					if((tokenTag[i] == '?' || tokenTag[i] == '/') && i == 1){
+						continue;
+					}
+					//if end delimiter is empty tag, declaration tag
+					else if((tokenTag[i] == ' ' || tokenTag[i] == '>') || ((tokenTag[i] == '?' || tokenTag[i] == '/') && i == tokenTag.length()-2)){
+						break;
+					}
+					//copy over tag
+					else{
+						tempTokenTag += tokenTag[i];
+					}
+				}
+				//update token tag
+				tokenTag = tempTokenTag;
+			}
+
+			//get delimtters + tag 
+			string startTag = tokenTag.substr(0,2), endTag = tokenTag.substr(tokenTag.length()-2,2);
+			StringTokenType tempTokenType;
+
+			//find token type
+			if(tokenTag[0] != '<'){
+				tempTokenType = CONTENT;
+			}
+			else if(endTag == "/>"){
+				tempTokenType = EMPTY_TAG;
+			}
+			else if(startTag == "<?"){
+				tempTokenType = DECLARATION;
+			}
+			else if(startTag == "</"){
+				tempTokenType = END_TAG;
+			}
+			else if(startTag[0] == '<'){
+				tempTokenType = START_TAG;
+			}
+
+			//update token and push to vector
+			token.tokenString = tokenTag;
+			token.tokenType = tempTokenType;
+			tokenizedInputVector.push_back(token);	
+
+			//reset strings
+			tokenTag = "";
+			tokenContent = "";
+			isStart = false;
+			isContent = true;
+			continue;
+		}
+		//if theres a dupe of delimiters, invalid format
+		else if((c == '<' && isStart) || (c == '>' && !isStart)){
+			//clear the vector and fail test
+			tokenizedInputVector.clear();
+			tokenizeFlag = false;
+
+			return false;
 		}
 
-		//skip over spaces
-		if(isspace(inputString[currentPoint])){
-			currentPoint++;
-			buffer++;
+		//if at start
+		if(isStart == true){
+			//add the char to token string
+			tokenTag += c;
+		}
+		//if inside delimiter
+		else if(isContent){
+			//store char to content string
+			tokenContent += c;
+
+			//check and remove spaces from start
+			if(tokenContent[0] == ' '){
+				tokenContent.erase(0,1);
+			}
 		}
 	}
 
-	//update tokenize flag since valid
+	//if all pass, successful tokenize
 	tokenizeFlag = true;
 
 	return true;
@@ -233,67 +171,142 @@ bool XMLParser::tokenizeInputString(const std::string &inputString)
 // TODO: Implement the parseTokenizedInput method here
 bool XMLParser::parseTokenizedInput()
 {
-	//create token
-	_TokenStruct_ token;
-	string temp;
-	
-	//loop through vector
-	for(int i = 0; i < tokenizedInputVector.size(); i++){
-		//give token current vector element
-		token = tokenizedInputVector.at(i);
+	//if there are tags
+	if(tokenizedInputVector.size() > 0){
+		//var with all invalid chars
+		char invalid[] = {'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '/', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '`', '{', '|', '}', '~', ' ', '-', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 		
-		//store string of token
-		temp = token.tokenString;
-		
-		//if type 1
-		if(token.tokenType == 1){
-			//don't add to bag, but push to stack
-			parseStack->push(temp);
-		}
-		//if type 2
-		else if(token.tokenType == 2){
-			//get top of stack
-			string peekVal = parseStack->peek();
+		//for each token in vector
+		for(TokenStruct token : tokenizedInputVector){
+			//for each char in token's tag name
+			for(char currStringChar : token.tokenString){
+				//for each invalid char
+				for(char currInvalidChar : invalid){
+					//if token name char is invalid
+					if(currStringChar == currInvalidChar){
+						//unsuccessful parse
+						parseFlag = false;
 
-			//if not at top of stack
-			if(peekVal != temp){
+						return false;
+					}
+				}
+			}
+		}
+	}
+	//if there are no tags
+	else{
+		//unsuccessful parse
+		parseFlag = false;
+
+		return false;
+	}
+
+	string tag, begin, end;
+	//loop through token vector
+	for(TokenStruct token : tokenizedInputVector){
+		//get delimtters + tags
+		begin = token.tokenString.substr(0,2);
+		end = token.tokenString.substr(tag.length()-2,2);
+
+		//if empty tag, delcaration tag, or content element
+		if(token.tokenType == EMPTY_TAG || token.tokenType == DECLARATION || token.tokenType == CONTENT){
+			continue;
+		}
+		//if end tag
+		else if(token.tokenType == END_TAG){
+			//-----removing tags from string-----
+			//if content
+			if(token.tokenString[0] != '<'){
+				continue;
+			}
+			//if declaration tag
+			else if(token.tokenString[1] == '?'){
+				token.tokenString = token.tokenString.substr(2,token.tokenString.length()-4);
+			}
+			//if full tag with both delimiters 
+			else{
+				string tempTokenTag = "";
+				//loop through everything after delimiter
+				for(int i = 1; i < token.tokenString.length(); i++){
+					//if end/empty tag
+					if((token.tokenString[i] == '?' || token.tokenString[i] == '/') && i == 1){
+						continue;
+					}
+					//if end delimiter is empty tag, declaration tag
+					else if((token.tokenString[i] == ' ' || token.tokenString[i] == '>') || ((token.tokenString[i] == '?' || token.tokenString[i] == '/') && i == token.tokenString.length()-2)){
+						break;
+					}
+					//copy over tag
+					else{
+						tempTokenTag += token.tokenString[i];
+					}
+				}
+				//update token tag
+				token.tokenString = tempTokenTag;
+			}
+
+			//Check if match to top of stack. If not, we fail the nested test
+			if(token.tokenString == parseStack->peek())
+				parseStack->pop();
+			else{
+				parseStack->clear();
+				parseFlag = false;
+
 				return false;
 			}
-			//if at top of stack
-			else{
-				//add it to bag and remove from stack
-				elementNameBag->add(temp);
-				parseStack->pop();
-			}
 		}
-		//if type 3
-		else if(token.tokenType == 3){
-			//add to bag, not in stack
-			elementNameBag->add(temp);
+		//Start tag
+		else if(token.tokenType == START_TAG){
+			string tempTokenTag = "";
+			//loop through everything after delimiter
+			for(int i = 1; i < token.tokenString.length(); i++){
+				//if end/empty tag
+				if((token.tokenString[i] == '?' || token.tokenString[i] == '/') && i == 1){
+					continue;
+				}
+				//if end delimiter is empty tag, declaration tag
+				else if((token.tokenString[i] == ' ' || token.tokenString[i] == '>') || ((token.tokenString[i] == '?' || token.tokenString[i] == '/') && i == token.tokenString.length()-2)){
+					break;
+				}
+				//copy over tag
+				else{
+					tempTokenTag += token.tokenString[i];
+				}
+			}
+			//update token tag
+			token.tokenString = tempTokenTag;
+			parseStack->push(token.tokenString);
 		}
 	}
 
-	//update parse flag
-	parseFlag = true;
+	//check parse flag
+	if(parseStack->size() > 0){
+		//invalid so parse fail
+		parseFlag = false;
 
-	return true;
+		return false;
+	}
+	else{
+		//valid so parse success
+		parseFlag = true;
+
+		return true;
+	}
+	//reset stack
+	parseStack->clear();
 }
 
 // TODO: Implement the clear method here
 void XMLParser::clear()
 {
-	//clear bag and stack
-	delete elementNameBag;
-	delete parseStack;
+	//clear success flags
+	tokenizeFlag = false;
+	parseFlag = false;
 
-	//clear vector
-	int i = 0; 
-	//while not at end
-	while(i < tokenizedInputVector.size()){
-		//pop element from vector and increment loop
-		tokenizedInputVector.pop_back();
-		i++;
-	}
+	//clear internal data structures
+	tokenizedInputVector.clear();
+	elementNameBag->clear();
+	parseStack->clear();
 }
 
 vector<TokenStruct> XMLParser::returnTokenizedInput() const
@@ -306,14 +319,19 @@ bool XMLParser::containsElementName(const std::string &inputString) const
 {
 	//if tokenizeInputstring() and parseTokenizedInput() are true
 	if(tokenizeFlag && parseFlag){
-		//loop through data
-		for(int i = 0; i < elementNameBag->size(); i++){
-			//check if target string at that position
-			if(elementNameBag->contains(inputString)){
-				return true;
+		//clear bag
+		elementNameBag->clear();
+
+		//loop through vector of tokens
+		for(TokenStruct t : tokenizedInputVector){
+			//if target is start or empty tag
+			if(t.tokenType == START_TAG || t.tokenType == EMPTY_TAG){
+				//add the token name to bag
+				elementNameBag->add(t.tokenString);
 			}
 		}
-		return false;
+
+		return true;
 	}
 	//else, input not tokenized/parsed
 	else{
@@ -326,18 +344,19 @@ int XMLParser::frequencyElementName(const std::string &inputString) const
 {
 	//if tokenizeInputstring() and parseTokenizedInput() are true
 	if(tokenizeFlag == true && parseFlag == true){
-		//vars for num occurances and bag data
-		int count = 0;
-		vector<string> data = elementNameBag->toVector();
+		//clear bag
+		elementNameBag->clear();
 
-		//loop through vector and count num occurances
-		for(int i = 0; i < data.size(); i++){
-			if(data.at(i) == inputString){
-				count++;
+		//loop through vector
+		for(TokenStruct t : tokenizedInputVector){
+			//if target is start or empty tag
+			if(t.tokenType == START_TAG || t.tokenType == EMPTY_TAG){
+				//add the token name to bag
+				elementNameBag->add(t.tokenString);
 			}
 		}
 
-		return count;
+		return true;
 	}
 	//else, input not tokenized/parsed
 	else{
