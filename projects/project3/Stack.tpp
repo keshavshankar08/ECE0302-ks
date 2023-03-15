@@ -10,7 +10,7 @@
 
 // TODO: Implement the constructor here
 template<class ItemType>
-Stack<ItemType>::Stack() : headPtr(nullptr) 
+Stack<ItemType>::Stack() 
 {
 	headPtr = nullptr;
 	currentSize = 0;
@@ -20,16 +20,14 @@ Stack<ItemType>::Stack() : headPtr(nullptr)
 template<class ItemType>
 Stack<ItemType>::~Stack()
 {
-	while(isEmpty() == false){
-		pop();
-	}
+	clear();
 }  // end destructor
 
 // TODO: Implement the isEmpty method here
 template<class ItemType>
 bool Stack<ItemType>::isEmpty() const
 {
-	if(headPtr == nullptr){
+	if(headPtr == nullptr && currentSize == 0){
 		return true;
 	}
 	else{
@@ -102,8 +100,11 @@ bool Stack<ItemType>::pop()
 template<class ItemType>
 void Stack<ItemType>::clear()
 {
+	while(isEmpty() == false){
+		pop();
+	}
+
 	//update head and size
 	headPtr = nullptr;
 	currentSize = 0;
 }  // end clear
-

@@ -6,7 +6,6 @@
 
 using namespace std;
 
-// TODO Implement tests of your Stack class and XMLParser class here
 
 TEST_CASE( "Test Bag add", "[ADT Bag]" )
 {
@@ -180,7 +179,7 @@ TEST_CASE( "Test XMLParser Final Handout-0", "[XMLParser]" )
 		XMLParser myXMLParser;
 		ifstream myfile ("./TestFile.txt");
 		std::string inputString((std::istreambuf_iterator<char>(myfile) ), (std::istreambuf_iterator<char>()) );
-
+		std::cout<<inputString;
 		bool success;
 		success = myXMLParser.tokenizeInputString(inputString);
 		REQUIRE(success);

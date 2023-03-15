@@ -7,37 +7,43 @@
 #include <assert.h>
 #include "XMLParser.hpp"
 
+static std::string removeDelimiter(std::string);
+
 // TODO: Implement the constructor here
 XMLParser::XMLParser()
 {
-	elementNameBag = new Bag<string>;
-	parseStack = new Stack<string>;
+	elementNameBag = new Bag<std::string>;
+	parseStack = new Stack<std::string>;
 }  // end default constructor
 
 // TODO: Implement the destructor here
 XMLParser::~XMLParser()
 {
+	//clear internal data structures
+	clear();
+	
 	//delete bag and stack
 	delete elementNameBag;
 	delete parseStack;
 
-	//clear internal data structures
-	clear();
 }  // end destructor
 
 // TODO: Implement the tokenizeInputString method
 bool XMLParser::tokenizeInputString(const std::string &inputString)
 {
-	bool isStart = false, isContent = true, isInvalid = false;
+	//flags for checking position/info in string
+	bool tagStart = false, elementContent = true;
+
+	//strings to store temp token tag and string
 	string tokenTag = "", tokenContent = "";
 	
 	//loop through string
 	for(char c : inputString){
 		//if at start of tag
-		if(c == '<' && !isStart){
+		if(c == '<' && !tagStart){
 			//if theres content already
 			if(tokenContent.length() > 0){
-				//loop through content and remove white spaces
+				//loop through content and remove whitespaces
 				string tempTokenContent = "";
 				for(int i = 0; i < tokenContent.length(); i++){
 					if(tokenContent[i] != ' '){
@@ -61,47 +67,17 @@ bool XMLParser::tokenizeInputString(const std::string &inputString)
 			//reset strings
 			tokenContent = "";
 			tokenTag = "";
-			isStart = true;
-			isContent = false;
+			tagStart = true;
+			elementContent = false;
 		}
 		//store the tag
-		else if(c == '>' && isStart){
+		else if(c == '>' && tagStart){
 			//add char to tag
 			tokenTag += c;
 
 			//create token with tag info
 			TokenStruct token;
-
-			//-----removing tags from string-----
-			//if content
-			if(tokenTag[0] != '<'){
-				continue;
-			}
-			//if declaration tag
-			else if(tokenTag[1] == '?'){
-				tokenTag = tokenTag.substr(2,tokenTag.length()-4);
-			}
-			//if full tag with both delimiters 
-			else{
-				string tempTokenTag = "";
-				//loop through everything after delimiter
-				for(int i = 1; i < tokenTag.length(); i++){
-					//if end/empty tag
-					if((tokenTag[i] == '?' || tokenTag[i] == '/') && i == 1){
-						continue;
-					}
-					//if end delimiter is empty tag, declaration tag
-					else if((tokenTag[i] == ' ' || tokenTag[i] == '>') || ((tokenTag[i] == '?' || tokenTag[i] == '/') && i == tokenTag.length()-2)){
-						break;
-					}
-					//copy over tag
-					else{
-						tempTokenTag += tokenTag[i];
-					}
-				}
-				//update token tag
-				tokenTag = tempTokenTag;
-			}
+			token.tokenString = removeDelimiter(tokenTag);
 
 			//get delimtters + tag 
 			string startTag = tokenTag.substr(0,2), endTag = tokenTag.substr(tokenTag.length()-2,2);
@@ -125,20 +101,20 @@ bool XMLParser::tokenizeInputString(const std::string &inputString)
 			}
 
 			//update token and push to vector
-			token.tokenString = tokenTag;
 			token.tokenType = tempTokenType;
 			tokenizedInputVector.push_back(token);	
 
 			//reset strings
 			tokenTag = "";
 			tokenContent = "";
-			isStart = false;
-			isContent = true;
+			tagStart = false;
+			elementContent = true;
+
 			continue;
 		}
 		//if theres a dupe of delimiters, invalid format
-		else if((c == '<' && isStart) || (c == '>' && !isStart)){
-			//clear the vector and fail test
+		else if((c == '<' && tagStart) || (c == '>' && !tagStart)){
+			//clear the vector and fail tokenize
 			tokenizedInputVector.clear();
 			tokenizeFlag = false;
 
@@ -146,12 +122,12 @@ bool XMLParser::tokenizeInputString(const std::string &inputString)
 		}
 
 		//if at start
-		if(isStart == true){
+		if(tagStart == true){
 			//add the char to token string
 			tokenTag += c;
 		}
 		//if inside delimiter
-		else if(isContent){
+		else if(elementContent){
 			//store char to content string
 			tokenContent += c;
 
@@ -200,55 +176,31 @@ bool XMLParser::parseTokenizedInput()
 
 		return false;
 	}
-
-	string tag, begin, end;
+	
+	string tagStart = "", tagEnd = "";
 	//loop through token vector
 	for(TokenStruct token : tokenizedInputVector){
 		//get delimtters + tags
-		begin = token.tokenString.substr(0,2);
-		end = token.tokenString.substr(tag.length()-2,2);
+		tagStart = token.tokenString.substr(0,2);
+		tagEnd = token.tokenString.substr(token.tokenString.length() - 2,2);
 
 		//if empty tag, delcaration tag, or content element
 		if(token.tokenType == EMPTY_TAG || token.tokenType == DECLARATION || token.tokenType == CONTENT){
+			//do nothing
 			continue;
 		}
 		//if end tag
 		else if(token.tokenType == END_TAG){
-			//-----removing tags from string-----
-			//if content
-			if(token.tokenString[0] != '<'){
-				continue;
-			}
-			//if declaration tag
-			else if(token.tokenString[1] == '?'){
-				token.tokenString = token.tokenString.substr(2,token.tokenString.length()-4);
-			}
-			//if full tag with both delimiters 
-			else{
-				string tempTokenTag = "";
-				//loop through everything after delimiter
-				for(int i = 1; i < token.tokenString.length(); i++){
-					//if end/empty tag
-					if((token.tokenString[i] == '?' || token.tokenString[i] == '/') && i == 1){
-						continue;
-					}
-					//if end delimiter is empty tag, declaration tag
-					else if((token.tokenString[i] == ' ' || token.tokenString[i] == '>') || ((token.tokenString[i] == '?' || token.tokenString[i] == '/') && i == token.tokenString.length()-2)){
-						break;
-					}
-					//copy over tag
-					else{
-						tempTokenTag += token.tokenString[i];
-					}
-				}
-				//update token tag
-				token.tokenString = tempTokenTag;
-			}
+			//remove delimter
+			string tempTokenString = removeDelimiter(token.tokenString);
 
-			//Check if match to top of stack. If not, we fail the nested test
-			if(token.tokenString == parseStack->peek())
+			//if match
+			if(tempTokenString == parseStack->peek()){
+				//remove
 				parseStack->pop();
+			}
 			else{
+				//unsuccessful parse
 				parseStack->clear();
 				parseFlag = false;
 
@@ -257,43 +209,29 @@ bool XMLParser::parseTokenizedInput()
 		}
 		//Start tag
 		else if(token.tokenType == START_TAG){
-			string tempTokenTag = "";
-			//loop through everything after delimiter
-			for(int i = 1; i < token.tokenString.length(); i++){
-				//if end/empty tag
-				if((token.tokenString[i] == '?' || token.tokenString[i] == '/') && i == 1){
-					continue;
-				}
-				//if end delimiter is empty tag, declaration tag
-				else if((token.tokenString[i] == ' ' || token.tokenString[i] == '>') || ((token.tokenString[i] == '?' || token.tokenString[i] == '/') && i == token.tokenString.length()-2)){
-					break;
-				}
-				//copy over tag
-				else{
-					tempTokenTag += token.tokenString[i];
-				}
-			}
-			//update token tag
-			token.tokenString = tempTokenTag;
-			parseStack->push(token.tokenString);
+			//remvoe delimiter
+			string tempTokenString = removeDelimiter(token.tokenString);
+			
+			//update string
+			parseStack->push(tempTokenString);
 		}
 	}
 
 	//check parse flag
 	if(parseStack->size() > 0){
 		//invalid so parse fail
+		parseStack->clear();
 		parseFlag = false;
 
 		return false;
 	}
 	else{
 		//valid so parse success
+		parseStack->clear();
 		parseFlag = true;
-
+		
 		return true;
 	}
-	//reset stack
-	parseStack->clear();
 }
 
 // TODO: Implement the clear method here
@@ -319,48 +257,70 @@ bool XMLParser::containsElementName(const std::string &inputString) const
 {
 	//if tokenizeInputstring() and parseTokenizedInput() are true
 	if(tokenizeFlag && parseFlag){
-		//clear bag
-		elementNameBag->clear();
-
 		//loop through vector of tokens
 		for(TokenStruct t : tokenizedInputVector){
 			//if target is start or empty tag
-			if(t.tokenType == START_TAG || t.tokenType == EMPTY_TAG){
-				//add the token name to bag
-				elementNameBag->add(t.tokenString);
+			if(inputString == t.tokenString){
+				return true;
 			}
 		}
-
-		return true;
 	}
 	//else, input not tokenized/parsed
 	else{
 		throw(logic_error("Error"));
 	}
+	return false;
 }
 
 // TODO: Implement the frequencyElementName method
 int XMLParser::frequencyElementName(const std::string &inputString) const
 {
+	//var for frequency
+	int count = 0;
+
 	//if tokenizeInputstring() and parseTokenizedInput() are true
 	if(tokenizeFlag == true && parseFlag == true){
-		//clear bag
-		elementNameBag->clear();
-
 		//loop through vector
 		for(TokenStruct t : tokenizedInputVector){
-			//if target is start or empty tag
-			if(t.tokenType == START_TAG || t.tokenType == EMPTY_TAG){
-				//add the token name to bag
-				elementNameBag->add(t.tokenString);
+			if(inputString == t.tokenString){
+				count++;
 			}
 		}
-
-		return true;
 	}
 	//else, input not tokenized/parsed
 	else{
 		throw(logic_error("Error not tokenized/parsed"));
 	}
+
+	return count;
 }
 
+//function to remove the ends (reduces using multiple for loops to extract only content)
+static std::string removeDelimiter(std::string s){
+	//If content, dont change
+	if(s[0] != '<'){
+		return s;
+	}
+	//If declaration tag
+	else if(s[1] == '?'){
+		//get rid of <? and ?>
+		return s.substr(2,s.length() - 4);
+	}
+	//else its a full tag
+	else{
+		string element = "";
+		//loop through everything after delimiter
+		for(int i = 1; i < s.length(); i++){
+			//if end/empty tag
+			if((s[i] == '?' || s[i] == '/') && i == 1)
+				continue;
+				//if end delimiter is empty tag, declaration tag
+			else if((s[i] == ' ' || s[i] == '>') || ((s[i] == '?' || s[i] == '/') && i == s.length()-2)) //2nd char from end
+				break;
+			//copy over tag otherwise
+			else 
+				element += s[i];
+		}
+		return element;
+	}
+}

@@ -32,7 +32,7 @@ private:
   // You can add or change the private fields.
 
 	//flags for success
-	bool tokenizeFlag, parseFlag = false;
+	bool tokenizeFlag = false, parseFlag = false;
 	
 public:
 	/** The class constructor.
