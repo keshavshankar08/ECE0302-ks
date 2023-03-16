@@ -179,7 +179,6 @@ TEST_CASE( "Test XMLParser Final Handout-0", "[XMLParser]" )
 		XMLParser myXMLParser;
 		ifstream myfile ("./TestFile.txt");
 		std::string inputString((std::istreambuf_iterator<char>(myfile) ), (std::istreambuf_iterator<char>()) );
-		std::cout<<inputString;
 		bool success;
 		success = myXMLParser.tokenizeInputString(inputString);
 		REQUIRE(success);

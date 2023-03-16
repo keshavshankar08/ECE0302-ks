@@ -182,7 +182,7 @@ bool XMLParser::parseTokenizedInput()
 	for(TokenStruct token : tokenizedInputVector){
 		//get delimtters + tags
 		tagStart = token.tokenString.substr(0,2);
-		tagEnd = token.tokenString.substr(token.tokenString.length() - 2,2);
+		tagEnd = token.tokenString.substr(token.tokenString.length() - 2, 2);
 
 		//if empty tag, delcaration tag, or content element
 		if(token.tokenType == EMPTY_TAG || token.tokenType == DECLARATION || token.tokenType == CONTENT){
@@ -208,21 +208,18 @@ bool XMLParser::parseTokenizedInput()
 			}
 		}
 		//Start tag
-		else if(token.tokenType == START_TAG){
-			//remvoe delimiter
-			string tempTokenString = removeDelimiter(token.tokenString);
-			
+		else if(token.tokenType == START_TAG){			
 			//update string
-			parseStack->push(tempTokenString);
+			parseStack->push(removeDelimiter(token.tokenString));
 		}
 	}
 
 	//check parse flag
 	if(parseStack->size() > 0){
-		//invalid so parse fail
+		//invalid since not empty, so parse fail
 		parseStack->clear();
-		parseFlag = false;
-
+		parseFlag = false;	
+		
 		return false;
 	}
 	else{
