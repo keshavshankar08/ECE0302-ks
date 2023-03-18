@@ -7,16 +7,23 @@
 #include <assert.h>
 #include "XMLParser.hpp"
 
-static std::string removeDelimiter(std::string);
+static std::string removeDelimiter(std::string s);
+static void addToBad(Bag<std::string>* elementNameBag, std::vector<TokenStruct> tokenizedInputVector);
 
-// TODO: Implement the constructor here
+/**
+ * @brief Construct a new XMLParser::XMLParser object
+ * 
+ */
 XMLParser::XMLParser()
 {
-	elementNameBag = new Bag<std::string>;
-	parseStack = new Stack<std::string>;
+	elementNameBag = new Bag<std::string>();
+	parseStack = new Stack<std::string>();
 }  // end default constructor
 
-// TODO: Implement the destructor here
+/**
+ * @brief Destroy the XMLParser::XMLParser object
+ * 
+ */
 XMLParser::~XMLParser()
 {
 	//clear internal data structures
@@ -28,7 +35,13 @@ XMLParser::~XMLParser()
 
 }  // end destructor
 
-// TODO: Implement the tokenizeInputString method
+/**
+ * @brief breaks a string into tokens if possible
+ * 
+ * @param inputString 
+ * @return true 
+ * @return false 
+ */
 bool XMLParser::tokenizeInputString(const std::string &inputString)
 {
 	//flags for checking position/info in string
@@ -80,7 +93,7 @@ bool XMLParser::tokenizeInputString(const std::string &inputString)
 			token.tokenString = removeDelimiter(tokenTag);
 
 			//get delimtters + tag 
-			string startTag = tokenTag.substr(0,2), endTag = tokenTag.substr(tokenTag.length()-2,2);
+			string startTag = tokenTag.substr(0,2), endTag = tokenTag.substr(tokenTag.length() - 2,2);
 			StringTokenType tempTokenType;
 
 			//find token type
@@ -144,18 +157,23 @@ bool XMLParser::tokenizeInputString(const std::string &inputString)
 	return true;
 }  // end
 
-// TODO: Implement the parseTokenizedInput method here
+/**
+ * @brief parses all tokens to make sure they are valid
+ * 
+ * @return true 
+ * @return false 
+ */
 bool XMLParser::parseTokenizedInput()
 {
 	//if there are tags
 	if(tokenizedInputVector.size() > 0){
 		//var with all invalid chars
-		char invalid[] = {'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '/', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '`', '{', '|', '}', '~', ' ', '-', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-		
+		char invalid[] = {'!','"','#','$','%','&','\'','(',')','*','+',',','/',';','<','=','>','?','@','[','\\',']','^','`','{','|','}','~',' ','-'};
+		string temp;
 		//for each token in vector
 		for(TokenStruct token : tokenizedInputVector){
 			//for each char in token's tag name
-			for(char currStringChar : token.tokenString){
+			for(char currStringChar : temp){
 				//for each invalid char
 				for(char currInvalidChar : invalid){
 					//if token name char is invalid
@@ -165,6 +183,10 @@ bool XMLParser::parseTokenizedInput()
 
 						return false;
 					}
+				}
+				if(isdigit(currStringChar) == true){
+					parseFlag = false;
+					return false;
 				}
 			}
 		}
@@ -199,6 +221,13 @@ bool XMLParser::parseTokenizedInput()
 				//remove
 				parseStack->pop();
 			}
+			else if(parseStack->peek()[0] == '-' || parseStack->peek()[0] == ',' || parseStack->peek()[0] == '.' || isdigit(parseStack->peek()[0])){
+				//unsuccessful parse
+				parseStack->clear();
+				parseFlag = false;
+
+				return false;
+			}
 			else{
 				//unsuccessful parse
 				parseStack->clear();
@@ -231,7 +260,10 @@ bool XMLParser::parseTokenizedInput()
 	}
 }
 
-// TODO: Implement the clear method here
+/**
+ * @brief clears all vars
+ * 
+ */
 void XMLParser::clear()
 {
 	//clear success flags
@@ -244,55 +276,63 @@ void XMLParser::clear()
 	parseStack->clear();
 }
 
+/**
+ * @brief returns vector
+ * 
+ * @return vector<TokenStruct> 
+ */
 vector<TokenStruct> XMLParser::returnTokenizedInput() const
 {
 	return tokenizedInputVector;
 }
 
-// TODO: Implement the containsElementName method
+/**
+ * @brief determines if a target string is contained in any token's string
+ * 
+ * @param inputString 
+ * @return true 
+ * @return false 
+ */
 bool XMLParser::containsElementName(const std::string &inputString) const
 {
-	//if tokenizeInputstring() and parseTokenizedInput() are true
 	if(tokenizeFlag && parseFlag){
-		//loop through vector of tokens
-		for(TokenStruct t : tokenizedInputVector){
-			//if target is start or empty tag
-			if(inputString == t.tokenString){
-				return true;
-			}
-		}
+		//add the valid tags to bag
+		addToBad(elementNameBag, tokenizedInputVector);
+
+		//loop through bag and see if contained
+		return elementNameBag->contains(inputString);
 	}
-	//else, input not tokenized/parsed
 	else{
-		throw(logic_error("Error"));
+		return false;
 	}
-	return false;
 }
 
-// TODO: Implement the frequencyElementName method
+/**
+ * @brief determines the number of occurances of a target string
+ * 
+ * @param inputString 
+ * @return int 
+ */
 int XMLParser::frequencyElementName(const std::string &inputString) const
 {
-	//var for frequency
-	int count = 0;
-
-	//if tokenizeInputstring() and parseTokenizedInput() are true
-	if(tokenizeFlag == true && parseFlag == true){
-		//loop through vector
-		for(TokenStruct t : tokenizedInputVector){
-			if(inputString == t.tokenString){
-				count++;
-			}
-		}
+	if(tokenizeFlag && parseFlag){
+		//add the valid tags to bag
+		addToBad(elementNameBag, tokenizedInputVector);
+		
+		//loop through bag and get frequency
+		return elementNameBag->getFrequencyOf(inputString);
 	}
-	//else, input not tokenized/parsed
 	else{
-		throw(logic_error("Error not tokenized/parsed"));
+		return -1;
 	}
-
-	return count;
 }
 
-//function to remove the ends (reduces using multiple for loops to extract only content)
+/**
+ * @brief removes the attributes and delimters from a string
+ * 
+ * @param s 
+ * @return std::string 
+ */
 static std::string removeDelimiter(std::string s){
 	//If content, dont change
 	if(s[0] != '<'){
@@ -319,5 +359,24 @@ static std::string removeDelimiter(std::string s){
 				element += s[i];
 		}
 		return element;
+	}
+}
+
+/**
+ * @brief adds all valid token tags' strings to bag
+ * 
+ * @param elementNameBag 
+ * @param tokenizedInputVector 
+ */
+static void addToBad(Bag<std::string>* elementNameBag, std::vector<TokenStruct> tokenizedInputVector){
+	elementNameBag->clear();
+	for(TokenStruct t : tokenizedInputVector){
+
+		if(t.tokenType == END_TAG || t.tokenType == DECLARATION || t.tokenType == CONTENT){
+			continue;
+		}
+		else if(t.tokenType == START_TAG || t.tokenType == EMPTY_TAG){
+			elementNameBag->add(t.tokenString);
+		}
 	}
 }
