@@ -14,7 +14,7 @@ ADD_EXECUTABLE(compare compare.cpp)
 TARGET_LINK_LIBRARIES(compare image)
 
 set(QUEUE_SOURCE
-  list.hpp list.tpp queue.hpp queue.tpp)
+  list.hpp list.tpp queue.hpp queue.tpp Node.hpp Node.tpp)
 
 set(TEST_SOURCE
   test_queue.cpp)

@@ -51,8 +51,6 @@ public:
   long int getPosition(const T& item);
 
 private:
-  
-  
 
 };
 

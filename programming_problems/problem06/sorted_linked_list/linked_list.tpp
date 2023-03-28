@@ -71,6 +71,9 @@ std::size_t LinkedList<T>::getLength() const noexcept
 template <typename T>
 bool LinkedList<T>::insert(std::size_t position, const T& item)
 {
+	if(position < 0 || position > itemCount){
+		throw std::range_error("out of bounds in insert");
+	}
 	if ((position >= 0) && (position <= itemCount)) {
 		Node<T>* newNodePtr = new Node<T>(item);
 		if (position == 0) {
@@ -91,6 +94,9 @@ bool LinkedList<T>::insert(std::size_t position, const T& item)
 template <typename T>
 bool LinkedList<T>::remove(std::size_t position)
 {
+	if(headPtr == nullptr || position < 0 || position > itemCount){
+		throw std::range_error("empty/out of bounds in remove");
+	}
 	if ((position >= 0) && (position < itemCount)) {
 		Node<T>* curPtr = nullptr;
 		if (position == 0) {
@@ -141,6 +147,9 @@ template <typename T>
 
 void LinkedList<T>::setEntry(std::size_t position, const T& newValue)
 {
+	if(position < 0 || position > itemCount || isEmpty()){
+		throw std::range_error("out of bounds in insert");
+	}
 	if((position >= 0) && (position < itemCount))
 	getNodeAt(position)->setItem(newValue);
 } //end setEntry

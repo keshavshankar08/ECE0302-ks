@@ -1,0 +1,69 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "priorityqueue",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "submission::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-submission-Debug-b728495dbfc0d9ff75cd.json",
+					"name" : "submission",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "test-priority-queue::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-test-priority-queue-Debug-b8d330f6686ae71b8c7a.json",
+					"name" : "test-priority-queue",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/keshavshankar/Library/CloudStorage/OneDrive-UniversityofPittsburgh/Spring 2023/ECE 0302/starter-code-ece0302/programming_problems/problem07/priority_queue/build",
+		"source" : "/Users/keshavshankar/Library/CloudStorage/OneDrive-UniversityofPittsburgh/Spring 2023/ECE 0302/starter-code-ece0302/programming_problems/problem07/priority_queue"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}
