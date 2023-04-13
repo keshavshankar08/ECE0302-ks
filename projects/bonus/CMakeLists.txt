@@ -5,7 +5,7 @@ project(bonus)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(SOURCE test_database.cpp Database.hpp Database.tpp binary_search_tree.hpp binary_search_tree.tpp abstract_list.hpp list.hpp list.tpp)
+set(SOURCE Node.hpp Node.tpp test_database.cpp Database.hpp Database.tpp binary_search_tree.hpp binary_search_tree.tpp abstract_list.hpp list.hpp list.tpp)
 
 add_executable(test-database test_database.cpp Database.hpp)
 

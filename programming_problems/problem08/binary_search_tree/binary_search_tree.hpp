@@ -30,6 +30,15 @@ private:
         K key;
         Node<K, I>* left = 0;
         Node<K, I>* right = 0;
+        //helper to set members
+        void setMembers(KeyType k, ItemType i){
+            key = k;
+            data = i;
+        }
+        void setChildren(Node<K, I>* l, Node<K, I>* r){
+            left = l;
+            right = r;
+        }
     };
 
     template <typename K, typename I>

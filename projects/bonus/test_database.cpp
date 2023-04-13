@@ -27,15 +27,8 @@ TEST_CASE("Test Add", "[add]") {
     REQUIRE(!testdb.isEmpty());
     REQUIRE(testdb.contains("key1"));
     REQUIRE(testdb.contains("key2"));
-}
-
-
-TEST_CASE("Test Duplicate Add", "[duplicate add]") {
-    Database<std::string> testdb;
-    std::string e1 = "entry";
-    
-    testdb.add("key1", "key2", e1);
-    REQUIRE(!testdb.add("key1", "key2", e1));
+    testdb.clear();
+    REQUIRE(testdb.isEmpty());
 }
 
 
@@ -136,10 +129,23 @@ TEST_CASE("Test Entry Types", "[entry type]") {
     e2.pubYear = 2032;
 
     testdb.add(isbn2, catalog_id2, e2);
-
-    // TODO
+    
     
 }
+
+// TO DO
+TEST_CASE("Test Duplicate Add", "[duplicate add]") {
+    Database<std::string> testdb;
+    std::string e1 = "entry";
+    
+    testdb.add("key1", "key2", e1);
+    testdb.add("key3", "key4", "hello");
+    REQUIRE(!testdb.add("key1", "key2", e1));
+    REQUIRE(testdb.getValue("key1") == e1);
+    testdb.remove("key1");
+    REQUIRE(testdb.getValue("key3") == "hello");
+}
+
 
 
 

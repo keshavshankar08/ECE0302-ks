@@ -34,6 +34,8 @@ public:
    */
   void replaceif(const T &p, std::size_t cost);
 
+  void swap(int pos1, int pos2);
+
 private:
 
   std::vector<State<T>> queue;
