@@ -2,6 +2,15 @@
 #define _ADJACENCY_LIST_GRAPH_H_
 
 #include "abstract_graph.hpp"
+#include <vector>
+
+template <typename LabelType>
+struct Node{
+    LabelType data;
+    std::vector<LabelType> adjacencies;
+
+};
+
 
 template <typename LabelType>
 class AdjacencyListGraph: public AbstractGraph<LabelType>
@@ -22,6 +31,8 @@ class AdjacencyListGraph: public AbstractGraph<LabelType>
 
         void breadthFirstTraversal(LabelType start, void visit(LabelType&));
   
+  private:
+    std::vector<Node<LabelType>> list;
 };
 
 #include "adjacency_list_graph.tpp"

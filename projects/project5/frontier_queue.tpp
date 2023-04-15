@@ -6,58 +6,83 @@ template <typename T>
 State<T> frontier_queue<T>::pop() {
   //error if queue empty
   if(queue.empty()){
-    throw std::runtime_error("queue empty");
+    throw std::logic_error("queue empty");
   }
-
-  //get copy of front and back of queue
-  State<T> rootCopy = queue.front();
-  State<T> tailCopy = queue.back();
-
-  //replace root with tail and delete tail
-  queue.at(0) = tailCopy;
-  queue.pop_back();
-
-  //sort root to correct spot
-  int pos = 1;
-  //while not at end
-  while((pos*2)-1 < queue.size()){
-    //if left child < parent, swap
-    if(queue.at((pos*2)-1).getFCost() < queue.at(pos-1).getFCost()){
-      swap((pos*2)-1, pos-1);
-    }
-    //if right child < parent, swap
-    else if(queue.at(pos*2).getFCost() < queue.at(pos-1).getFCost() && (pos*2) < queue.size()){
-      swap(pos*2, pos-1);
-    }
-    else{
-      return rootCopy;
-    }
+  //if only 1 element in queue
+  else if(queue.size() == 1){
+    //just pop the one item
+    State<T> first = queue.back();
+    queue.pop_back();
+    return first;
   }
+  //if more than 1 element in queue
+  else{
+    //get copy of first and last element
+    State<T> headCopy = queue.front();
+    State<T> tailCopy = queue.back();
 
-  //return popped element
-  return rootCopy;
+    //replace root with tail and delete tail
+    queue.at(0) = tailCopy;
+    queue.pop_back();
+
+    //vars to keep track of swap vars
+    int n = queue.size(), i = 0, parent = i, left = 2 * i + 1, right = 2 * i + 2;
+
+    //while children not over size of list
+    while(left < n && left > 0 && right < n){
+      //if left child smaller, swap and set as new parent
+      if(queue.at(left).getFCost() < queue.at(right).getFCost() && queue.at(left).getFCost() < queue.at(parent).getFCost()){
+        swap(left, parent);
+        parent = left;
+      }
+      //if right child smaller, swap and set as new parent
+      else if(queue.at(right).getFCost() < queue.at(left).getFCost() && queue.at(right).getFCost() < queue.at(parent).getFCost()){
+        swap(right, parent);
+        parent = right;
+      }
+      //else, in order to break
+      else{
+        break;
+      }
+
+      //update vars for swap position
+      i = parent;
+      left = 2 * i + 1;
+      right = 2 * i + 2;
+    }
+
+    //return popped element
+    return headCopy;
+  }
 }
 
 template <typename T>
 void frontier_queue<T>::push(const T &p, std::size_t cost, std::size_t heur) {
-  //add new obj to end
+  //create object with new data
   State<T> newState = {p, cost, heur};
-  queue.push_back(newState);
 
-  //sort new state to correct spot
-  int pos = queue.size();
-  //while not at root yet
-  while(pos/2 >= 1){
-    //if parent is greater than current, swap
-    if(queue.at((pos/2)-1).getFCost() > queue.at(pos-1).getFCost()){
-      swap((pos/2)-1, pos-1);
-      pos /= 2;
-    }
-    //else its in the right spot already
-    else{
-      return;
+  //case where queue empty
+  if(empty()){
+    queue.push_back(newState);
+  }
+  //else elements exist already
+  else{
+    //add state to last empty spot
+    queue.push_back(newState);
+
+    //vars for position of swap items
+    int n = queue.size(), i = n - 1, parent = (i - 1) / 2;
+
+    //loop until min at top
+    while(queue.at(parent).getFCost() > queue.at(i).getFCost() && parent != 0){
+      //swap elements and update position of new swap items
+      swap(parent, i);
+      i = parent;
+      parent = (i - 1) / 2;
     }
   }
+
+  return;
 }
 
 template <typename T>
@@ -70,7 +95,7 @@ bool frontier_queue<T>::contains(const T &p) {
   //loop through queue
   for(int i = 0; i < queue.size(); i++){
     //if p in it, found
-    if(queue[i].getValue() == p){
+    if(queue.at(i).getValue() == p){
       return true;
     }
   }
@@ -81,23 +106,18 @@ bool frontier_queue<T>::contains(const T &p) {
 
 template <typename T>
 void frontier_queue<T>::replaceif(const T &p, std::size_t cost) {
+  //loop through queue
   for(int i = 0; i < queue.size(); i++){
-    if(queue.at(i).getValue() == p && queue.at(i).getPathCost() > cost){
+    //if element is p and cost is lower, replace it
+    if(queue.at(i).getValue() == p && cost < queue.at(i).getPathCost()){
       queue.at(i).updatePathCost(cost);
-      for(int j = i - 1; j >= 0; j--){
-        if(i == 0){
-          return;
-        }
-        else if(queue.at(j).getFCost() > queue.at(i).getFCost()){
-          swap(i,j);
-        }
-      }
     }
   }
 
   return;
 }
 
+//helper function to swap queue items
 template <typename T>
 void frontier_queue<T>::swap(int pos1, int pos2){
   State<T> temp = queue.at(pos1);

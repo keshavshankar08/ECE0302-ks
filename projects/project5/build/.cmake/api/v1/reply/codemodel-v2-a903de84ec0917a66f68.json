@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "P5",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "submission::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-submission-Debug-b728495dbfc0d9ff75cd.json",
+					"name" : "submission",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "test-frontier-queue::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-test-frontier-queue-Debug-63dea3e1da61ea04dc5d.json",
+					"name" : "test-frontier-queue",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "test-solver::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-test-solver-Debug-663f04426bdb4e99b564.json",
+					"name" : "test-solver",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/keshavshankar/Library/CloudStorage/OneDrive-UniversityofPittsburgh/Spring 2023/ECE 0302/starter-code-ece0302/projects/project5/build",
+		"source" : "/Users/keshavshankar/Library/CloudStorage/OneDrive-UniversityofPittsburgh/Spring 2023/ECE 0302/starter-code-ece0302/projects/project5"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}
