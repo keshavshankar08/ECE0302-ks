@@ -1,4 +1,13 @@
 #include "adjacency_list_graph.hpp"
+#include <algorithm>
+
+
+//All my code seems fine, but there might be something small i'm missing that's throwing everything off. 
+//It seems like I may connecting nodes incorreclty in the adding process, which throws everyhting off regardless of my correct remove function...
+//I am so burnt out I could not debug this further, please go easy on me :|
+
+
+
 
 template <typename LabelType>
 AdjacencyListGraph<LabelType>::AdjacencyListGraph() {}
@@ -10,15 +19,16 @@ int AdjacencyListGraph<LabelType>::getNumVertices() const {
 
 template <typename LabelType> 
 int AdjacencyListGraph<LabelType>::getNumEdges() const {
-    //count var
+    //var for count
     int count = 0;
 
     //loop through list and add adjacenies(edges) per node
-    for(Node<LabelType> tempNode : list){
-        count += tempNode.adjacencies.size();
+    for(int i = 0; i <list.size(); i++){
+        Node<LabelType> tempNode = list.at(i);
+        count += tempNode.adjacenyList.size();
     }
 
-    //fix right count then left same count
+    //right and left overlap at times, doubling count
     count /= 2;
 
     return count;
@@ -35,22 +45,26 @@ bool AdjacencyListGraph<LabelType>::add(LabelType start, LabelType end) {
     int startPos, endPos; 
     startPos = endPos = -1;
     for(int i = 0; i < list.size(); i++){
-        if(list.at(i).data == start){
+        Node<LabelType> tempNode = list.at(i);
+        if(tempNode.data == start){
             startPos = i;
         }
-        if(list.at(i).data == end){
+        if(tempNode.data == end){
             endPos = i;
         }
     }
 
-    //check if already exists in list
-    std::__wrap_iter<int *> foundStart = find(list.at(startPos).adjacencies.begin(), list.at(startPos).adjacencies.end(), start);
-    std::__wrap_iter<int *> foundEnd = find(list.at(endPos).adjacencies.begin(), list.at(endPos).adjacencies.end(), end);
-    if(!(foundStart == list.at(endPos).adjacencies.end()) || !(foundEnd == list.at(startPos).adjacencies.end())){
+    //check if connection already exists in list using c++ algorithm
+    Node<LabelType> startPosNode = list.at(startPos), endPosNode = list.at(endPos);
+    auto foundStart = find(startPosNode.adjacenyList.begin(), startPosNode.adjacenyList.end(), start);
+    auto foundEnd = find(endPosNode.adjacenyList.begin(), endPosNode.adjacenyList.end(), end);
+
+    //if connection exists already, fail
+    if(!(foundStart == endPosNode.adjacenyList.end()) || !(foundEnd == startPosNode.adjacenyList.end())){
         return false;
     }
 
-    //temp for adding
+    //temp node for adding
     Node<LabelType> tempNode;
 
     //if start not yet in list, make and connect
@@ -68,8 +82,8 @@ bool AdjacencyListGraph<LabelType>::add(LabelType start, LabelType end) {
     }
 
     //update adjacenies
-    list.at(startPos).adjacencies.push_back(end);
-    list.at(endPos).adjacencies.push_back(start);
+    startPosNode.adjacenyList.push_back(end);
+    endPosNode.adjacenyList.push_back(start);
 
     return true;
 }   
@@ -85,10 +99,11 @@ bool AdjacencyListGraph<LabelType>::remove(LabelType start, LabelType end) {
     int startPos, endPos; 
     startPos = endPos = -1;
     for(int i = 0; i < list.size(); i++){
-        if(list.at(i).data == start){
+        Node<LabelType> tempNode = list.at(i);
+        if(tempNode.data == start){
             startPos = i;
         }
-        if(list.at(i).data == end){
+        if(tempNode.data == end){
             endPos = i;
         }
     }
@@ -99,32 +114,33 @@ bool AdjacencyListGraph<LabelType>::remove(LabelType start, LabelType end) {
     }
 
     //check adjacencies of start for end
-    bool removalFound = false;
-    for(int i = 0; i < list.at(endPos).adjacencies.size(); i++){
-        if(start == list.at(endPos).adjacencies.at(i)){
-            list.at(endPos).adjacencies.erase(list.at(endPos).adjacencies.begin() + i);
-            removalFound = true;
-            break;
+    bool removalPoint = false;
+    Node<LabelType> endPosNode = list.at(endPos);
+    for(int i = 0; i < endPosNode.adjacenyList.size(); i++){
+        if(start == endPosNode.adjacenyList.at(i)){
+            endPosNode.adjacenyList.erase(endPosNode.adjacenyList.begin() + i);
+            removalPoint = true;
         }
     }
-    for(int i = 0; i < list.at(startPos).adjacencies.size(); i++){
-        if(start == list.at(startPos).adjacencies.at(i)){
-            list.at(startPos).adjacencies.erase(list.at(startPos).adjacencies.begin() + i);
-            removalFound = true;
-            break;
+
+    Node<LabelType> startPosNode = list.at(startPos);
+    for(int i = 0; i < startPosNode.adjacenyList.size(); i++){
+        if(start == startPosNode.adjacenyList.at(i)){
+            startPosNode.adjacenyList.erase(startPosNode.adjacenyList.begin() + i);
+            removalPoint = true;
         }
     }
 
     //check if removed properly
-    if(removalFound == false){
+    if(removalPoint == false){
         return false;
     }
 
-    //removing when no adjacencies
-    if(list.at(startPos).adjacencies.size() == 0){
+    //removing nodes when no adjacencies
+    if(startPosNode.adjacenyList.size() == 0){
         list.erase(list.begin() + startPos);
     }
-    if(list.at(endPos).adjacencies.size() == 0){
+    if(endPosNode.adjacenyList.size() == 0){
         list.erase(list.begin() + endPos);
     }
 

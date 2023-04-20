@@ -7,7 +7,7 @@
 template <typename LabelType>
 struct Node{
     LabelType data;
-    std::vector<LabelType> adjacencies;
+    std::vector<LabelType> adjacenyList;
 
 };
 
