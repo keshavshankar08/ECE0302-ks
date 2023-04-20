@@ -95,7 +95,8 @@ bool frontier_queue<T>::contains(const T &p) {
   //loop through queue
   for(int i = 0; i < queue.size(); i++){
     //if p in it, found
-    if(queue.at(i).getValue() == p){
+    State<T> temp = queue.at(i);
+    if(temp.getValue() == p){
       return true;
     }
   }
@@ -109,7 +110,8 @@ void frontier_queue<T>::replaceif(const T &p, std::size_t cost) {
   //loop through queue
   for(int i = 0; i < queue.size(); i++){
     //if element is p and cost is lower, replace it
-    if(queue.at(i).getValue() == p && cost < queue.at(i).getPathCost()){
+    State<T> temp = queue.at(i);
+    if(cost < temp.getPathCost() && temp.getValue() == p){
       queue.at(i).updatePathCost(cost);
     }
   }

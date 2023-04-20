@@ -133,7 +133,7 @@ TEST_CASE("Test Entry Types", "[entry type]") {
     
 }
 
-// TO DO
+// testing multple adds called
 TEST_CASE("Test Duplicate Add", "[duplicate add]") {
     Database<std::string> testdb;
     std::string e1 = "entry";
